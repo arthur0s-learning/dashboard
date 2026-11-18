@@ -1,0 +1,2841 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Un aperçu simple et clair des revenus, dépenses et budgets."
+    />
+    <meta name="theme-color" content="#f6f7f4" />
+    <title>Clair — Mon budget</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #241a49;
+        --muted: #847d9d;
+        --line: #ece7f4;
+        --paper: #fff;
+        --canvas: #f8f6fc;
+        --green: #6951e8;
+        --green-dark: #5038cc;
+        --mint: #f0edff;
+        --red: #e7567a;
+        --orange: #ff9a4c;
+        --blue: #24b5c5;
+        --purple: #a363e8;
+        --shadow: 0 12px 32px rgb(57 37 105 / 6%);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        background: var(--canvas);
+        color: var(--ink);
+      }
+
+      button,
+      select,
+      input {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .app {
+        display: grid;
+        min-height: 100vh;
+        grid-template-columns: 238px minmax(0, 1fr);
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        display: flex;
+        height: 100vh;
+        flex-direction: column;
+        padding: 28px 18px 22px;
+        border-right: 1px solid var(--line);
+        background: var(--paper);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 10px;
+        color: var(--ink);
+        font-size: 20px;
+        font-weight: 760;
+        letter-spacing: -0.8px;
+        text-decoration: none;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border-radius: 12px;
+        background: var(--green);
+        color: white;
+      }
+
+      .brand-mark svg {
+        width: 19px;
+        height: 19px;
+      }
+
+      .nav-section {
+        margin-top: 42px;
+      }
+
+      .nav-title {
+        margin: 0 12px 11px;
+        color: #a0aaa4;
+        font-size: 10px;
+        font-weight: 750;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+      }
+
+      .nav-list {
+        display: grid;
+        gap: 5px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .nav-link {
+        display: flex;
+        min-height: 43px;
+        align-items: center;
+        gap: 11px;
+        padding: 0 12px;
+        border-radius: 10px;
+        color: #78857e;
+        font-size: 12px;
+        font-weight: 580;
+        text-decoration: none;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        background: var(--mint);
+        color: var(--green-dark);
+      }
+
+      .nav-link.active {
+        font-weight: 700;
+      }
+
+      .nav-link svg {
+        width: 17px;
+        height: 17px;
+        flex: 0 0 auto;
+      }
+
+      .sidebar-bottom {
+        display: grid;
+        gap: 19px;
+        margin-top: auto;
+      }
+
+      .tip-card {
+        padding: 15px;
+        border: 1px solid #e8eee8;
+        border-radius: 13px;
+        background: #f9fbf8;
+      }
+
+      .tip-icon {
+        display: grid;
+        width: 29px;
+        height: 29px;
+        margin-bottom: 11px;
+        place-items: center;
+        border-radius: 9px;
+        background: #edf4e8;
+        color: #789459;
+      }
+
+      .tip-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .tip-card strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 11px;
+      }
+
+      .tip-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.55;
+      }
+
+      .profile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 7px;
+      }
+
+      .avatar {
+        display: grid;
+        width: 35px;
+        height: 35px;
+        place-items: center;
+        border-radius: 50%;
+        background: #e9ded1;
+        color: #725b49;
+        font-size: 11px;
+        font-weight: 750;
+      }
+
+      .profile-copy {
+        display: grid;
+        gap: 3px;
+      }
+
+      .profile-copy strong {
+        font-size: 11px;
+      }
+
+      .profile-copy span {
+        color: var(--muted);
+        font-size: 9px;
+      }
+
+      main {
+        width: 100%;
+        max-width: 1580px;
+        margin: 0 auto;
+        padding: 30px clamp(22px, 4vw, 56px) 42px;
+      }
+
+      .topbar,
+      .page-heading,
+      .card-heading,
+      .section-heading,
+      .legend-item,
+      .transaction-row,
+      .budget-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .topbar {
+        margin-bottom: 36px;
+      }
+
+      .breadcrumb {
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .breadcrumb strong {
+        color: var(--ink);
+        font-weight: 650;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .period-select,
+      .filter-select,
+      .search-input {
+        height: 37px;
+        border: 1px solid #e5eae5;
+        border-radius: 9px;
+        background: var(--paper);
+        color: #526158;
+        font-size: 10px;
+      }
+
+      .period-select,
+      .filter-select {
+        padding: 0 28px 0 11px;
+      }
+
+      .icon-button {
+        position: relative;
+        display: grid;
+        width: 37px;
+        height: 37px;
+        place-items: center;
+        border: 1px solid #e5eae5;
+        border-radius: 9px;
+        background: var(--paper);
+        color: #68776e;
+      }
+
+      .icon-button svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .notification-dot {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        width: 6px;
+        height: 6px;
+        border: 1px solid white;
+        border-radius: 50%;
+        background: var(--orange);
+      }
+
+      .page-heading {
+        align-items: flex-end;
+        gap: 14px;
+        margin-bottom: 23px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--green);
+        font-size: 9px;
+        font-weight: 750;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(24px, 3vw, 31px);
+        font-weight: 690;
+        letter-spacing: -1.1px;
+      }
+
+      .subtitle {
+        margin: 7px 0 0;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .demo-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 8px;
+        padding: 5px 8px;
+        border: 1px solid #e8eee8;
+        border-radius: 20px;
+        color: #77877d;
+        font-size: 9px;
+        font-weight: 650;
+        vertical-align: 3px;
+      }
+
+      .demo-badge::before {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #9ab27e;
+        content: "";
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 37px;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 0 12px;
+        border: 0;
+        border-radius: 9px;
+        background: var(--green);
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        transition: background 150ms ease, transform 150ms ease;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+        background: var(--green-dark);
+      }
+
+      .button.secondary {
+        border: 1px solid #e5eae5;
+        background: white;
+        color: #64736a;
+      }
+
+      .button.secondary:hover {
+        background: #f7f9f6;
+      }
+
+      .button svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 13px;
+        margin-bottom: 15px;
+      }
+
+      .card {
+        border: 1px solid #edf0ec;
+        border-radius: 13px;
+        background: var(--paper);
+        box-shadow: var(--shadow);
+      }
+
+      .kpi-card {
+        min-height: 127px;
+        padding: 16px 17px;
+      }
+
+      .kpi-card[role="button"] {
+        cursor: pointer;
+      }
+
+      .kpi-card[role="button"]:focus-visible,
+      .budget-item:focus-visible,
+      .transaction-row:focus-visible,
+      .category-purchase:focus-visible,
+      .donut-segment:focus-visible,
+      .expense-point:focus-visible {
+        outline: 3px solid #ffab5d;
+        outline-offset: 3px;
+      }
+
+      .kpi-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #7d8983;
+        font-size: 10px;
+      }
+
+      .kpi-icon {
+        display: grid;
+        width: 26px;
+        height: 26px;
+        place-items: center;
+        border-radius: 8px;
+        background: #eff5f0;
+        color: var(--green);
+      }
+
+      .kpi-icon.orange {
+        background: #fbf2e9;
+        color: #ca884b;
+      }
+
+      .kpi-icon.purple {
+        background: #f2eff8;
+        color: #8d7ab4;
+      }
+
+      .kpi-icon.blue {
+        background: #edf4f7;
+        color: #648ca2;
+      }
+
+      .kpi-icon svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .kpi-value {
+        margin: 14px 0 6px;
+        font-size: clamp(19px, 2vw, 25px);
+        font-weight: 690;
+        letter-spacing: -0.8px;
+        white-space: nowrap;
+      }
+
+      .kpi-footnote {
+        color: #9aa39d;
+        font-size: 9px;
+      }
+
+      .positive {
+        color: var(--green);
+        font-weight: 700;
+      }
+
+      .negative {
+        color: var(--red);
+        font-weight: 700;
+      }
+
+      .content-grid,
+      .bottom-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(270px, 0.9fr);
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .chart-card,
+      .category-card,
+      .budget-card,
+      .transactions-card {
+        min-width: 0;
+        padding: 19px;
+      }
+
+      .category-card {
+        overflow: hidden;
+      }
+
+      .card-title {
+        margin: 0;
+        font-size: 12px;
+        font-weight: 720;
+        letter-spacing: -0.1px;
+      }
+
+      .card-subtitle {
+        margin: 5px 0 0;
+        color: #98a29c;
+        font-size: 9px;
+      }
+
+      .legend {
+        display: flex;
+        gap: 12px;
+      }
+
+      .legend-item {
+        justify-content: flex-start;
+        gap: 6px;
+        color: #78857e;
+        font-size: 9px;
+      }
+
+      .legend-dot,
+      .legend-color {
+        width: 8px;
+        height: 8px;
+        flex: 0 0 auto;
+        border-radius: 50%;
+      }
+
+      .chart-wrap {
+        height: 215px;
+        margin-top: 19px;
+      }
+
+      .chart-wrap svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+
+      .grid-line {
+        stroke: #edf0ec;
+        stroke-dasharray: 4 5;
+        stroke-width: 1;
+      }
+
+      .axis-label {
+        fill: #a0aaa3;
+        font-family: inherit;
+        font-size: 9px;
+      }
+
+      .income-line,
+      .expense-line {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2.5;
+      }
+
+      .income-line {
+        stroke: #d4e4d7;
+      }
+
+      .expense-line {
+        stroke: var(--green);
+      }
+
+      .expense-point {
+        fill: white;
+        stroke: var(--green);
+        stroke-width: 2;
+        cursor: pointer;
+      }
+
+      .chart-insight {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 6px;
+        color: #98a29c;
+        font-size: 9px;
+      }
+
+      .chart-insight strong {
+        color: var(--green);
+        font-weight: 720;
+      }
+
+      .donut-wrap {
+        position: relative;
+        display: grid;
+        width: 164px;
+        height: 164px;
+        margin: 12px auto 16px;
+        place-items: center;
+      }
+
+      .donut-wrap svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+
+      .donut-track,
+      .donut-segment {
+        fill: none;
+        stroke-width: 17;
+      }
+
+      .donut-track {
+        stroke: #f0f3ef;
+      }
+
+      .donut-segment {
+        stroke-linecap: round;
+        cursor: pointer;
+        pointer-events: stroke;
+      }
+
+      .donut-center {
+        position: absolute;
+        display: grid;
+        gap: 4px;
+        text-align: center;
+      }
+
+      .donut-center span {
+        color: #97a19b;
+        font-size: 9px;
+      }
+
+      .donut-center strong {
+        font-size: 18px;
+        font-weight: 720;
+        letter-spacing: -0.5px;
+      }
+
+      .category-legend {
+        display: grid;
+        gap: 5px;
+        margin-top: 12px;
+      }
+
+      .category-accordion {
+        --category-color: var(--green);
+        overflow: hidden;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        background: #faf9fd;
+        transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+      }
+
+      .category-accordion:hover {
+        transform: translateX(2px);
+        border-color: #ece7f7;
+        background: #fff;
+      }
+
+      .category-accordion[open] {
+        border-color: color-mix(in srgb, var(--category-color) 25%, white);
+        background: color-mix(in srgb, var(--category-color) 5%, white);
+      }
+
+      .category-accordion > summary {
+        display: flex;
+        min-height: 46px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 7px 10px;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .category-accordion > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .category-summary-main,
+      .category-summary-end {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+      }
+
+      .category-summary-main {
+        gap: 9px;
+      }
+
+      .category-summary-end {
+        flex: 0 0 auto;
+        gap: 7px;
+      }
+
+      .category-accordion .legend-name {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 8px;
+        color: var(--ink);
+        font-size: 10px;
+        font-weight: 680;
+      }
+
+      .category-accordion .legend-name span:last-child {
+        display: grid;
+        gap: 3px;
+      }
+
+      .category-accordion .legend-name small {
+        color: var(--muted);
+        font-size: 8px;
+        font-weight: 500;
+      }
+
+      .category-accordion .legend-color {
+        width: 9px;
+        height: 9px;
+        background: var(--category-color) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--category-color) 13%, white);
+      }
+
+      .category-accordion .legend-amount {
+        color: var(--ink);
+        font-size: 9px;
+        font-weight: 700;
+      }
+
+      .accordion-chevron {
+        width: 15px;
+        height: 15px;
+        color: var(--category-color);
+        transition: transform 200ms ease;
+      }
+
+      .category-accordion[open] .accordion-chevron {
+        transform: rotate(180deg);
+      }
+
+      .category-accordion::details-content {
+        block-size: 0;
+        overflow: clip;
+        transition:
+          block-size 240ms ease,
+          content-visibility 240ms allow-discrete;
+      }
+
+      .category-accordion[open]::details-content {
+        block-size: auto;
+      }
+
+      .accordion-content {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 240ms ease;
+      }
+
+      .category-accordion[open] .accordion-content {
+        grid-template-rows: 1fr;
+      }
+
+      .accordion-content-inner {
+        min-height: 0;
+        overflow: hidden;
+        padding: 0 11px 0 29px;
+      }
+
+      .category-accordion[open] .accordion-content-inner {
+        padding-bottom: 10px;
+      }
+
+      .category-purchase {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 7px 0;
+        border: 0;
+        border-top: 1px solid rgb(36 26 73 / 7%);
+        background: transparent;
+        color: #746d89;
+        font-size: 8px;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .category-purchase:hover {
+        color: var(--green);
+      }
+
+      .category-purchase strong {
+        color: var(--ink);
+        font-size: 8px;
+        white-space: nowrap;
+      }
+
+      .category-toggle {
+        flex: 0 0 auto;
+        font-size: 8px;
+      }
+
+      .section-heading {
+        gap: 12px;
+        margin-bottom: 15px;
+      }
+
+      .text-button {
+        padding: 5px 0 5px 8px;
+        border: 0;
+        background: transparent;
+        color: var(--green);
+        font-size: 9px;
+        font-weight: 700;
+      }
+
+      .budget-total {
+        display: flex;
+        width: 100%;
+        align-items: baseline;
+        gap: 5px;
+        margin: 0 0 17px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .budget-total:hover strong {
+        color: var(--green);
+      }
+
+      .budget-total:focus-visible {
+        outline: 3px solid #ffab5d;
+        outline-offset: 4px;
+        border-radius: 6px;
+      }
+
+      .budget-total strong {
+        font-size: 20px;
+        letter-spacing: -0.6px;
+      }
+
+      .budget-total span {
+        color: #98a29c;
+        font-size: 9px;
+      }
+
+      .budget-list {
+        display: grid;
+        gap: 14px;
+      }
+
+      .budget-item {
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .budget-item:hover .budget-meta > span {
+        color: var(--green);
+      }
+
+      .budget-item:hover .progress-track {
+        box-shadow: 0 0 0 3px rgb(105 81 232 / 10%);
+      }
+
+      .budget-meta {
+        gap: 8px;
+        margin-bottom: 7px;
+        color: #78857e;
+        font-size: 9px;
+      }
+
+      .budget-meta strong {
+        color: var(--ink);
+        font-size: 9px;
+        font-weight: 680;
+        white-space: nowrap;
+      }
+
+      .budget-meta strong.over {
+        color: var(--red);
+      }
+
+      .progress-track {
+        height: 5px;
+        overflow: hidden;
+        border-radius: 50px;
+        background: #eff2ee;
+      }
+
+      .progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: var(--green);
+      }
+
+      .progress-fill.orange {
+        background: var(--orange);
+      }
+
+      .progress-fill.purple {
+        background: var(--purple);
+      }
+
+      .progress-fill.blue {
+        background: var(--blue);
+      }
+
+      .progress-fill.red {
+        background: var(--red);
+      }
+
+      .transactions-card {
+        grid-column: 1 / -1;
+      }
+
+      .transaction-tools {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .search-wrap {
+        position: relative;
+      }
+
+      .search-wrap svg {
+        position: absolute;
+        top: 11px;
+        left: 10px;
+        width: 14px;
+        height: 14px;
+        color: #9aa39d;
+        pointer-events: none;
+      }
+
+      .search-input {
+        width: 180px;
+        padding: 0 10px 0 30px;
+        outline: none;
+      }
+
+      .search-input:focus,
+      .filter-select:focus,
+      .period-select:focus {
+        border-color: #9ab7a2;
+        box-shadow: 0 0 0 3px rgb(46 116 86 / 9%);
+      }
+
+      .filter-select {
+        max-width: 160px;
+      }
+
+      .transactions-list {
+        display: grid;
+      }
+
+      .transaction-row {
+        min-height: 57px;
+        width: 100%;
+        gap: 12px;
+        padding: 0;
+        border-top: 1px solid #f0f2ef;
+        background: transparent;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: background 160ms ease, padding 160ms ease;
+      }
+
+      .transaction-row:hover {
+        padding-right: 8px;
+        padding-left: 8px;
+        border-radius: 9px;
+        background: #f8f6fc;
+      }
+
+      .transaction-main {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .transaction-icon {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 10px;
+        background: #f2f5f1;
+        color: #698374;
+      }
+
+      .transaction-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .transaction-copy {
+        display: grid;
+        min-width: 0;
+        gap: 4px;
+      }
+
+      .transaction-copy strong {
+        overflow: hidden;
+        font-size: 10px;
+        font-weight: 670;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .transaction-copy span {
+        color: #98a29c;
+        font-size: 9px;
+      }
+
+      .transaction-amount {
+        flex: 0 0 auto;
+        font-size: 10px;
+        font-weight: 720;
+      }
+
+      .transaction-amount.income {
+        color: var(--green);
+      }
+
+      .transaction-amount.expense {
+        color: var(--ink);
+      }
+
+      .empty-state {
+        padding: 26px 8px;
+        color: #8f9b93;
+        font-size: 10px;
+        text-align: center;
+      }
+
+      .demo-note {
+        margin: 17px 0 0;
+        color: #a0aaa3;
+        font-size: 9px;
+        text-align: center;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .error-banner {
+        margin-bottom: 15px;
+        padding: 12px 14px;
+        border: 1px solid #f0d7d2;
+        border-radius: 10px;
+        background: #fff7f5;
+        color: #a94d41;
+        font-size: 11px;
+      }
+
+      @media (max-width: 1060px) {
+        .app {
+          grid-template-columns: 205px minmax(0, 1fr);
+        }
+
+        .sidebar {
+          padding-right: 14px;
+          padding-left: 14px;
+        }
+
+        main {
+          padding-right: 25px;
+          padding-left: 25px;
+        }
+
+        .kpi-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .app {
+          display: block;
+        }
+
+        .sidebar {
+          position: sticky;
+          z-index: 5;
+          top: 0;
+          display: flex;
+          height: 62px;
+          flex-direction: row;
+          align-items: center;
+          gap: 20px;
+          padding: 0 17px;
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .brand {
+          flex: 0 0 auto;
+          padding: 0;
+        }
+
+        .nav-section {
+          min-width: 0;
+          margin: 0;
+          overflow-x: auto;
+        }
+
+        .nav-title,
+        .sidebar-bottom {
+          display: none;
+        }
+
+        .nav-list {
+          display: flex;
+          width: max-content;
+          gap: 4px;
+        }
+
+        .nav-link {
+          min-height: 36px;
+          gap: 7px;
+          padding: 0 9px;
+          font-size: 10px;
+          white-space: nowrap;
+        }
+
+        main {
+          padding: 23px 18px 35px;
+        }
+
+        .topbar {
+          margin-bottom: 27px;
+        }
+
+        .content-grid {
+          grid-template-columns: minmax(0, 1.25fr) minmax(230px, 0.85fr);
+        }
+
+        .chart-card,
+        .category-card,
+        .budget-card,
+        .transactions-card {
+          padding: 16px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .content-grid,
+        .bottom-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .transactions-card {
+          grid-column: auto;
+        }
+
+        .page-heading {
+          align-items: flex-start;
+        }
+
+        .demo-badge {
+          margin-left: 4px;
+        }
+      }
+
+      @media (max-width: 430px) {
+        .breadcrumb,
+        .top-actions .icon-button {
+          display: none;
+        }
+
+        .topbar {
+          justify-content: flex-end;
+          margin-bottom: 24px;
+        }
+
+        .sidebar {
+          gap: 12px;
+          padding-right: 10px;
+          padding-left: 12px;
+        }
+
+        .brand {
+          gap: 7px;
+          font-size: 18px;
+        }
+
+        .brand-mark {
+          width: 30px;
+          height: 30px;
+        }
+
+        .nav-link {
+          gap: 5px;
+          padding: 0 7px;
+          font-size: 9px;
+        }
+
+        main {
+          padding-right: 14px;
+          padding-left: 14px;
+        }
+
+        .kpi-grid {
+          gap: 9px;
+        }
+
+        .kpi-card {
+          min-height: 116px;
+          padding: 13px;
+        }
+
+        .kpi-label {
+          font-size: 9px;
+        }
+
+        .kpi-value {
+          font-size: 19px;
+        }
+
+        .kpi-footnote {
+          font-size: 8px;
+        }
+
+        .page-heading {
+          gap: 8px;
+        }
+
+        h1 {
+          font-size: 23px;
+        }
+
+        .demo-badge {
+          font-size: 8px;
+        }
+
+        .button {
+          min-height: 35px;
+          padding: 0 9px;
+          font-size: 9px;
+        }
+
+        .transaction-tools {
+          width: 100%;
+        }
+
+        .search-wrap {
+          flex: 1 1 100%;
+        }
+
+        .search-input {
+          width: 100%;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+        }
+      }
+
+      body {
+        background:
+          radial-gradient(ellipse at 92% 3%, rgb(200 176 255 / 17%), transparent 29rem),
+          radial-gradient(ellipse at 52% 56%, rgb(255 215 174 / 12%), transparent 28rem),
+          var(--canvas);
+      }
+
+      .sidebar {
+        z-index: 3;
+        border-right: 0;
+        background: linear-gradient(165deg, #332270 0%, #211648 56%, #171233 100%);
+        color: white;
+      }
+
+      .brand,
+      .profile-copy strong {
+        color: white;
+      }
+
+      .brand-mark {
+        background: linear-gradient(145deg, #ffae67, #ff6c91);
+        box-shadow: 0 6px 20px rgb(255 108 145 / 34%);
+      }
+
+      .nav-title {
+        color: #a9a0d1;
+      }
+
+      .nav-link {
+        color: #c1badc;
+        transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+      }
+
+      .nav-link:hover {
+        transform: translateX(3px);
+        background: rgb(255 255 255 / 9%);
+        color: white;
+      }
+
+      .nav-link.active {
+        background: linear-gradient(100deg, #7757ef, #8e63f2);
+        color: white;
+        box-shadow: 0 7px 20px rgb(90 56 194 / 34%);
+      }
+
+      .tip-card {
+        border-color: rgb(255 255 255 / 12%);
+        background: rgb(255 255 255 / 7%);
+        color: white;
+      }
+
+      .tip-card p,
+      .profile-copy span {
+        color: #beb8d5;
+      }
+
+      .tip-icon {
+        background: rgb(255 181 104 / 17%);
+        color: #ffc078;
+      }
+
+      .avatar {
+        background: linear-gradient(140deg, #ffcf83, #ff9a82);
+        color: #693857;
+      }
+
+      main {
+        padding-top: 28px;
+      }
+
+      .topbar {
+        margin-bottom: 26px;
+      }
+
+      .period-select,
+      .filter-select,
+      .search-input,
+      .icon-button {
+        border-color: #e7e0f1;
+        box-shadow: 0 3px 12px rgb(55 38 93 / 3%);
+        transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+      }
+
+      .period-select:hover,
+      .filter-select:hover,
+      .icon-button:hover {
+        transform: translateY(-1px);
+        border-color: #c7b9f4;
+      }
+
+      .page-heading {
+        position: relative;
+        overflow: hidden;
+        min-height: 158px;
+        align-items: center;
+        margin-bottom: 18px;
+        padding: 27px 30px;
+        border: 0;
+        border-radius: 21px;
+        background: linear-gradient(112deg, #583bd0 0%, #7956ed 55%, #a362e7 100%);
+        box-shadow: 0 15px 34px rgb(95 61 203 / 22%);
+        color: white;
+        isolation: isolate;
+      }
+
+      .page-heading::before,
+      .page-heading::after {
+        position: absolute;
+        z-index: -1;
+        border: 1px solid rgb(255 255 255 / 17%);
+        border-radius: 50%;
+        content: "";
+        pointer-events: none;
+      }
+
+      .page-heading::before {
+        top: -110px;
+        right: 12%;
+        width: 280px;
+        height: 280px;
+        box-shadow:
+          0 0 0 22px rgb(255 255 255 / 4%),
+          0 0 0 47px rgb(255 255 255 / 4%);
+      }
+
+      .page-heading::after {
+        right: 30%;
+        bottom: -123px;
+        width: 183px;
+        height: 183px;
+        background: rgb(255 255 255 / 6%);
+      }
+
+      .page-heading .eyebrow {
+        color: #d3c8ff;
+      }
+
+      .page-heading h1 {
+        font-size: clamp(26px, 3.2vw, 35px);
+        letter-spacing: -1.3px;
+      }
+
+      .page-heading .subtitle {
+        color: #e0d9fa;
+      }
+
+      .demo-badge {
+        border-color: rgb(255 255 255 / 24%);
+        background: rgb(255 255 255 / 11%);
+        color: #f3edff;
+      }
+
+      .demo-badge::before {
+        background: #b6f27d;
+        box-shadow: 0 0 10px rgb(182 242 125 / 80%);
+      }
+
+      .button {
+        position: relative;
+        z-index: 1;
+        min-height: 41px;
+        padding: 0 15px;
+        border-radius: 11px;
+        background: linear-gradient(105deg, #ff9d59, #ff7188);
+        box-shadow: 0 8px 18px rgb(61 30 134 / 20%);
+        color: #3a1c51;
+        font-size: 10px;
+        transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(105deg, #ffab66, #ff8296);
+        box-shadow: 0 11px 22px rgb(61 30 134 / 27%);
+      }
+
+      .button.secondary {
+        border-color: #e7e0f1;
+        background: white;
+        box-shadow: 0 4px 13px rgb(55 38 93 / 5%);
+        color: var(--green-dark);
+      }
+
+      .button.secondary:hover {
+        background: #f9f7ff;
+      }
+
+      .kpi-card,
+      .chart-card,
+      .category-card,
+      .budget-card,
+      .transactions-card {
+        position: relative;
+        overflow: hidden;
+        border-color: rgb(226 220 239 / 85%);
+        border-radius: 17px;
+        box-shadow: 0 9px 28px rgb(57 37 105 / 5%);
+        transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+        animation: card-arrive 500ms both;
+      }
+
+      .kpi-card:hover,
+      .chart-card:hover,
+      .category-card:hover,
+      .budget-card:hover,
+      .transactions-card:hover {
+        transform: translateY(-3px);
+        border-color: #d7cdf2;
+        box-shadow: 0 16px 34px rgb(57 37 105 / 10%);
+      }
+
+      .kpi-card:nth-child(2) {
+        animation-delay: 50ms;
+      }
+
+      .kpi-card:nth-child(3) {
+        animation-delay: 100ms;
+      }
+
+      .kpi-card:nth-child(4) {
+        animation-delay: 150ms;
+      }
+
+      .chart-card {
+        animation-delay: 170ms;
+      }
+
+      .category-card {
+        animation-delay: 220ms;
+      }
+
+      .budget-card {
+        animation-delay: 270ms;
+      }
+
+      .transactions-card {
+        animation-delay: 320ms;
+      }
+
+      .kpi-card::before {
+        position: absolute;
+        inset: 0 0 auto;
+        height: 4px;
+        background: linear-gradient(90deg, #6e52ed, #a067eb);
+        content: "";
+      }
+
+      .kpi-card:nth-child(2)::before {
+        background: linear-gradient(90deg, #ffae58, #ff7184);
+      }
+
+      .kpi-card:nth-child(3)::before {
+        background: linear-gradient(90deg, #b45be1, #7756e9);
+      }
+
+      .kpi-card:nth-child(4)::before {
+        background: linear-gradient(90deg, #29bac4, #68d5ac);
+      }
+
+      .kpi-card:nth-child(2) .kpi-icon {
+        background: #fff0e7;
+        color: #ec8140;
+      }
+
+      .kpi-card:nth-child(3) .kpi-icon {
+        background: #f2eaff;
+        color: #9655dc;
+      }
+
+      .kpi-card:nth-child(4) .kpi-icon {
+        background: #e6f9f6;
+        color: #169ca4;
+      }
+
+      .kpi-value {
+        color: #281d50;
+        font-size: clamp(21px, 2.2vw, 27px);
+      }
+
+      .kpi-footnote {
+        color: #89819f;
+      }
+
+      .content-grid,
+      .bottom-grid {
+        gap: 17px;
+      }
+
+      .card-title {
+        color: #2a2050;
+        font-size: 13px;
+      }
+
+      .card-subtitle {
+        color: #8a83a0;
+      }
+
+      .income-line {
+        stroke: #31c7ae;
+        stroke-width: 3;
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        animation: draw-line 900ms 120ms ease forwards;
+      }
+
+      .expense-line {
+        stroke: #7251ee;
+        stroke-width: 3;
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        animation: draw-line 900ms ease forwards;
+      }
+
+      .grid-line {
+        stroke: #eeeaf5;
+      }
+
+      .expense-point {
+        stroke: #7251ee;
+        transform-box: fill-box;
+        transform-origin: center;
+        transition: r 150ms ease, fill 150ms ease;
+        animation: point-pop 400ms both;
+      }
+
+      .expense-point:hover {
+        r: 6px;
+        fill: #ff9e59;
+      }
+
+      .chart-insight strong {
+        color: #6951e8;
+      }
+
+      .donut-segment {
+        stroke-width: 18;
+        transition: stroke-width 180ms ease, opacity 180ms ease;
+        animation: donut-arrive 700ms both;
+      }
+
+      .donut-segment:hover {
+        stroke-width: 23;
+        opacity: 0.84;
+      }
+
+      .donut-center strong {
+        color: #2b2050;
+      }
+
+      .legend-dot {
+        box-shadow: 0 0 0 3px rgb(105 81 232 / 10%);
+      }
+
+      .transaction-row {
+        border-color: #f0edf5;
+        animation: row-arrive 320ms both;
+      }
+
+      .transaction-row:nth-child(2) {
+        animation-delay: 35ms;
+      }
+
+      .transaction-row:nth-child(3) {
+        animation-delay: 70ms;
+      }
+
+      .transaction-row:nth-child(4) {
+        animation-delay: 105ms;
+      }
+
+      .transaction-row:nth-child(5) {
+        animation-delay: 140ms;
+      }
+
+      .transaction-icon {
+        background: #f1edff;
+        color: #7054e8;
+        transition: transform 180ms ease, background 180ms ease;
+      }
+
+      .transaction-row:hover .transaction-icon {
+        transform: rotate(-7deg) scale(1.08);
+        background: #e8e0ff;
+      }
+
+      .transaction-amount.income {
+        color: #109a80;
+      }
+
+      .transaction-amount.expense {
+        color: #c74e6d;
+      }
+
+      .category-accordion {
+        animation: row-arrive 360ms both;
+      }
+
+      .category-accordion:nth-child(2) {
+        animation-delay: 35ms;
+      }
+
+      .category-accordion:nth-child(3) {
+        animation-delay: 70ms;
+      }
+
+      .category-accordion:nth-child(4) {
+        animation-delay: 105ms;
+      }
+
+      .category-accordion:nth-child(5) {
+        animation-delay: 140ms;
+      }
+
+      .category-accordion:nth-child(6) {
+        animation-delay: 175ms;
+      }
+
+      .category-accordion > summary:focus-visible,
+      .nav-link:focus-visible,
+      .button:focus-visible,
+      .text-button:focus-visible,
+      .icon-button:focus-visible {
+        outline: 3px solid #ffab5d;
+        outline-offset: 3px;
+      }
+
+      .text-button {
+        color: #674bdc;
+      }
+
+      .progress-track {
+        height: 7px;
+        background: #f0edf6;
+      }
+
+      .progress-fill {
+        box-shadow: 0 2px 8px color-mix(in srgb, currentColor 28%, transparent);
+        transition: width 550ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .progress-fill:not(.orange, .blue, .purple, .red) {
+        background: linear-gradient(90deg, #6850e8, #a169ed);
+      }
+
+      .progress-fill.orange {
+        background: linear-gradient(90deg, #ffbd5a, #ff8059);
+      }
+
+      .progress-fill.blue {
+        background: linear-gradient(90deg, #24b7c5, #68d7b1);
+      }
+
+      .progress-fill.purple {
+        background: linear-gradient(90deg, #a55de4, #d477d6);
+      }
+
+      .progress-fill.red {
+        background: linear-gradient(90deg, #ff826c, #e74d79);
+      }
+
+      .demo-note {
+        color: #827a9b;
+      }
+
+      .demo-note code {
+        padding: 2px 5px;
+        border-radius: 4px;
+        background: #efebf8;
+        color: #6348c8;
+      }
+
+      dialog.detail-dialog {
+        width: min(520px, calc(100vw - 28px));
+        max-height: min(78vh, 720px);
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid #e8e1f4;
+        border-radius: 20px;
+        background: white;
+        box-shadow: 0 28px 90px rgb(34 22 70 / 28%);
+        color: var(--ink);
+      }
+
+      dialog.detail-dialog::backdrop {
+        background: rgb(33 23 66 / 46%);
+        backdrop-filter: blur(5px);
+      }
+
+      .detail-dialog[open] {
+        animation: detail-arrive 220ms ease both;
+      }
+
+      .detail-content {
+        display: flex;
+        max-height: min(78vh, 720px);
+        flex-direction: column;
+      }
+
+      .detail-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 22px 23px 17px;
+        border-bottom: 1px solid #f0edf5;
+        background: linear-gradient(120deg, #f8f5ff, #fff8f1);
+      }
+
+      .detail-heading h2 {
+        margin: 0;
+        color: #291e4e;
+        font-size: 18px;
+        letter-spacing: -0.5px;
+      }
+
+      .detail-heading p {
+        margin: 6px 0 0;
+        color: #807995;
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      .detail-close {
+        display: grid;
+        width: 33px;
+        height: 33px;
+        flex: 0 0 auto;
+        place-items: center;
+        border: 1px solid #e9e3f2;
+        border-radius: 10px;
+        background: white;
+        color: #685c86;
+      }
+
+      .detail-close:hover {
+        background: #f0ebff;
+      }
+
+      .detail-close svg {
+        width: 15px;
+        height: 15px;
+      }
+
+      .detail-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 16px 21px 12px;
+        padding: 13px 15px;
+        border: 1px solid #eee8f8;
+        border-radius: 13px;
+        background: #faf8ff;
+      }
+
+      .detail-summary span {
+        color: #847c98;
+        font-size: 10px;
+      }
+
+      .detail-summary strong {
+        color: #5f45db;
+        font-size: 17px;
+        letter-spacing: -0.3px;
+      }
+
+      .detail-list {
+        display: grid;
+        min-height: 0;
+        gap: 0;
+        padding: 0 21px 20px;
+        overflow: auto;
+      }
+
+      .detail-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 53px;
+        border-top: 1px solid #f1eef5;
+      }
+
+      .detail-row-copy {
+        display: grid;
+        min-width: 0;
+        gap: 4px;
+      }
+
+      .detail-row-copy strong {
+        overflow: hidden;
+        color: #31264f;
+        font-size: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .detail-row-copy span {
+        color: #9189a2;
+        font-size: 9px;
+      }
+
+      .detail-row-amount {
+        flex: 0 0 auto;
+        color: #d25272;
+        font-size: 10px;
+        font-weight: 720;
+      }
+
+      .detail-row-amount.income {
+        color: #159a7e;
+      }
+
+      .budget-detail-meter {
+        height: 6px;
+        margin: 0 22px 17px;
+        overflow: hidden;
+        border-radius: 99px;
+        background: #f0edf6;
+      }
+
+      .budget-detail-meter span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #6951e8, #a363e8);
+      }
+
+      @keyframes detail-arrive {
+        from {
+          transform: translateY(8px) scale(0.985);
+          opacity: 0;
+        }
+
+        to {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+      }
+
+      @keyframes card-arrive {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes row-arrive {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes draw-line {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes point-pop {
+        from {
+          transform: scale(0);
+        }
+
+        to {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes donut-arrive {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .page-heading {
+          min-height: 150px;
+          padding: 22px 18px;
+        }
+
+        .page-heading::before {
+          right: -52px;
+        }
+
+        .category-card .card-heading {
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <a class="brand" href="#overview" aria-label="Clair, accueil">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m5 13.5 4.2 4.5L19 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          clair
+        </a>
+        <nav class="nav-section" aria-label="Navigation principale">
+          <p class="nav-title">Espace personnel</p>
+          <ul class="nav-list">
+            <li>
+              <a class="nav-link active" href="#overview" aria-current="page">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7" /><rect x="13.5" y="3.5" width="7" height="4" rx="1.5" stroke="currentColor" stroke-width="1.7" /><rect x="13.5" y="10.5" width="7" height="10" rx="1.5" stroke="currentColor" stroke-width="1.7" /><rect x="3.5" y="13.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7" /></svg>
+                Vue d'ensemble
+              </a>
+            </li>
+            <li>
+              <a class="nav-link" href="#transactions">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="18" cy="17" r="2" stroke="currentColor" stroke-width="1.7" /></svg>
+                Transactions
+              </a>
+            </li>
+            <li>
+              <a class="nav-link" href="#budgets">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+                Budgets
+              </a>
+            </li>
+            <li>
+              <a class="nav-link" href="#categories">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5v8.7l7.5 4.3A8.5 8.5 0 1 1 12 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /><path d="M15.5 4.3a8.6 8.6 0 0 1 5.2 8.2h-8.2V4.3h3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /></svg>
+                Catégories
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="tip-card">
+            <span class="tip-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M9 18h6m-5 3h4m-5.8-6.2A6.5 6.5 0 1 1 15.8 15c-.8.6-1.3 1.3-1.5 2h-4.6c-.2-.7-.7-1.4-1.5-2Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </span>
+            <strong>Un budget à votre rythme</strong>
+            <p>Les barres de progression suivent les limites définies pour chaque catégorie.</p>
+          </div>
+          <div class="profile">
+            <span class="avatar" aria-hidden="true">SC</span>
+            <span class="profile-copy"><strong>Sarah Colin</strong><span>Compte de démonstration</span></span>
+          </div>
+        </div>
+      </aside>
+
+      <main id="overview">
+        <header class="topbar">
+          <div class="breadcrumb">Espace personnel <span aria-hidden="true">/</span> <strong>Vue d'ensemble</strong></div>
+          <div class="top-actions">
+            <label class="sr-only" for="period-select">Période affichée</label>
+            <select class="period-select" id="period-select">
+              <option value="month">Mois des données</option>
+              <option value="30">30 derniers jours</option>
+              <option value="all">Toutes les données</option>
+            </select>
+            <button class="icon-button" type="button" aria-label="Données de démonstration">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 8v4m0 4h.01M10.3 3.8 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3l-7.5-13.2a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              <span class="notification-dot"></span>
+            </button>
+          </div>
+        </header>
+
+        <div id="load-error" class="error-banner" role="alert" hidden></div>
+
+        <section class="page-heading" aria-labelledby="page-title">
+          <div>
+            <p class="eyebrow">Bonjour Sarah</p>
+            <h1 id="page-title">Vos finances, en clair.<span class="demo-badge">Données fictives</span></h1>
+            <p class="subtitle" id="period-label">Résumé de votre budget.</p>
+          </div>
+          <button class="button secondary" id="export-button" type="button" title="Télécharger les transactions affichées au format CSV">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            Exporter CSV
+          </button>
+        </section>
+
+        <section class="kpi-grid" aria-label="Résumé financier">
+          <article class="card kpi-card" role="button" tabindex="0" data-detail-type="income" aria-label="Voir le détail des revenus">
+            <div class="kpi-label"><span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17 10 11l4 4 6-8m0 0h-5m5 0v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Revenus</div>
+            <div class="kpi-value" id="income-total">—</div>
+            <div class="kpi-footnote" id="income-count">Reçus sur la période</div>
+          </article>
+          <article class="card kpi-card" role="button" tabindex="0" data-detail-type="expense" aria-label="Voir le détail des dépenses">
+            <div class="kpi-label"><span class="kpi-icon orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M7 4v6m10-6v6M6 11h12v9H6z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Dépenses</div>
+            <div class="kpi-value" id="expense-total">—</div>
+            <div class="kpi-footnote" id="expense-count">Aucune dépense enregistrée</div>
+          </article>
+          <article class="card kpi-card" role="button" tabindex="0" data-detail-type="balance" aria-label="Voir le détail du solde disponible">
+            <div class="kpi-label"><span class="kpi-icon purple" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6.5h16v13H4zM4 10h16m-12 5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Reste disponible</div>
+            <div class="kpi-value" id="balance-total">—</div>
+            <div class="kpi-footnote">Revenus moins dépenses</div>
+          </article>
+          <article class="card kpi-card" role="button" tabindex="0" data-detail-type="savings" aria-label="Voir le détail de l'épargne potentielle">
+            <div class="kpi-label"><span class="kpi-icon blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18m6-13.5c0-1.5-1.8-2.5-4-2.5h-3c-2.2 0-4 1.1-4 3s1.8 3 4 3h2c2.2 0 4 1.1 4 3s-1.8 3-4 3h-3c-2.2 0-4-1-4-2.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /></svg></span>Épargne potentielle</div>
+            <div class="kpi-value" id="savings-rate">—</div>
+            <div class="kpi-footnote">Part des revenus non dépensée</div>
+          </article>
+        </section>
+
+        <section class="content-grid" aria-label="Graphiques financiers">
+          <article class="card chart-card">
+            <div class="card-heading">
+              <div><h2 class="card-title">Revenus & dépenses</h2><p class="card-subtitle">Évolution sur la période sélectionnée</p></div>
+              <div class="legend" aria-label="Légende">
+                <span class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Dépenses</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#d4e4d7"></span>Revenus</span>
+              </div>
+            </div>
+            <div class="chart-wrap" id="trend-chart" role="group" aria-label="Graphique des revenus et dépenses dans le temps"></div>
+            <div class="chart-insight"><strong id="daily-average">—</strong><span>de dépenses en moyenne par jour</span></div>
+          </article>
+
+          <article class="card category-card" id="categories">
+            <div class="card-heading">
+              <div><h2 class="card-title">Répartition des dépenses</h2><p class="card-subtitle">Ouvrez une catégorie pour voir les achats</p></div>
+              <button class="text-button category-toggle" id="toggle-categories" type="button" aria-controls="category-legend" aria-expanded="false">Tout ouvrir</button>
+            </div>
+            <div class="donut-wrap" id="category-chart" role="group" aria-label="Répartition des dépenses par catégorie"></div>
+            <div class="category-legend" id="category-legend"></div>
+          </article>
+        </section>
+
+        <section class="bottom-grid">
+          <article class="card budget-card" id="budgets">
+            <div class="section-heading">
+              <div><h2 class="card-title">Budgets par catégorie</h2><p class="card-subtitle">Dépenses par rapport aux limites prévues</p></div>
+              <span class="text-button" id="budget-period">Mois des données</span>
+            </div>
+            <button class="budget-total" id="budget-total-detail" type="button" aria-label="Voir le détail de tous les budgets"><strong id="budget-spent">—</strong><span id="budget-limit">sur — prévus</span></button>
+            <div class="budget-list" id="budget-list"></div>
+          </article>
+
+          <article class="card transactions-card" id="transactions">
+            <div class="section-heading">
+              <div><h2 class="card-title">Transactions</h2><p class="card-subtitle" id="transaction-count">Toutes les opérations</p></div>
+              <div class="transaction-tools">
+                <label class="search-wrap">
+                  <span class="sr-only">Rechercher une transaction</span>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.7" /><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /></svg>
+                  <input class="search-input" id="search-input" type="search" placeholder="Rechercher..." autocomplete="off" />
+                </label>
+                <label class="sr-only" for="category-filter">Filtrer les transactions par catégorie</label>
+                <select class="filter-select" id="category-filter"><option value="all">Toutes catégories</option></select>
+              </div>
+            </div>
+            <div class="transactions-list" id="transactions-list"></div>
+            <button class="text-button" id="show-more" type="button" hidden>Afficher plus</button>
+          </article>
+        </section>
+
+        <p class="demo-note">Démonstration — toutes les données sont fictives et proviennent de <code>data.json</code>.</p>
+      </main>
+    </div>
+
+    <dialog class="detail-dialog" id="detail-dialog" aria-labelledby="detail-title">
+      <div class="detail-content">
+        <header class="detail-heading">
+          <div>
+            <h2 id="detail-title">Détails</h2>
+            <p id="detail-description"></p>
+          </div>
+          <button class="detail-close" id="detail-close" type="button" aria-label="Fermer les détails">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="detail-summary"><span id="detail-summary-label">Total</span><strong id="detail-summary-total"></strong></div>
+        <div class="budget-detail-meter" id="detail-budget-meter" hidden><span></span></div>
+        <div class="detail-list" id="detail-list"></div>
+      </div>
+    </dialog>
+
+    <script src="data.js"></script>
+    <script>
+      const palette = ["#7652ef", "#ff9a4c", "#24b7c5", "#a45ce3", "#ed527b", "#25b99a", "#f07ab1", "#8290ff"];
+      const categoryIcons = {
+        courses: '<path d="M3 4h2l2.2 10.1a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 1.9-1.4L20 8H6m4 11h.01M17 19h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+        ecole: '<path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H20v17H7.5A2.5 2.5 0 0 0 5 21.5v-17ZM5 18.5A2.5 2.5 0 0 1 7.5 16H20M9 6h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+        travail: '<rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-13 5h18m-11 0v2h4v-2" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
+        logement: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
+        transport: '<path d="M5 16h14l-1.3-8.2A2 2 0 0 0 15.7 6H8.3a2 2 0 0 0-2 1.8L5 16Zm0 0-1 3m15-3 1 3M7 12h10M7 19h.01M17 19h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+        loisirs: '<path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Zm7 12 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
+        sante: '<path d="M20.8 8.8c0 5.5-8.8 11-8.8 11s-8.8-5.5-8.8-11A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
+        autres: '<circle cx="5" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="19" cy="12" r="1" fill="currentColor"/>',
+        revenus: '<path d="M12 19V5m-6 6 6-6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+      };
+
+      let dashboardData;
+      let selectedPeriod = "month";
+      let searchTerm = "";
+      let selectedCategory = "all";
+      let showAllTransactions = false;
+      let visibleTransactions = [];
+
+      const formatMoney = (value) =>
+        new Intl.NumberFormat("fr-FR", {
+          style: "currency",
+          currency: dashboardData.currency || "EUR",
+          maximumFractionDigits: 2,
+        }).format(value);
+
+      const formatCompactMoney = (value) =>
+        `${new Intl.NumberFormat("fr-FR", {
+          style: "currency",
+          currency: dashboardData.currency || "EUR",
+          notation: "compact",
+          maximumFractionDigits: 1,
+        }).format(value)}`;
+
+      const safeText = (value) => {
+        const element = document.createElement("span");
+        element.textContent = String(value);
+        return element.innerHTML;
+      };
+
+      function parseDate(date) {
+        return new Date(`${date}T12:00:00`);
+      }
+
+      function getDateRange() {
+        if (selectedPeriod === "month") {
+          return {
+            start: parseDate(dashboardData.period.start),
+            end: parseDate(dashboardData.period.end),
+            label: new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(parseDate(dashboardData.period.start)),
+          };
+        }
+
+        if (selectedPeriod === "30") {
+          const end = new Date();
+          end.setHours(12, 0, 0, 0);
+          const start = new Date(end);
+          start.setDate(start.getDate() - 29);
+          return { start, end, label: "30 derniers jours" };
+        }
+
+        const dates = dashboardData.transactions.map((transaction) => parseDate(transaction.date));
+        return {
+          start: new Date(Math.min(...dates)),
+          end: new Date(Math.max(...dates)),
+          label: "Toutes les données",
+        };
+      }
+
+      function getPeriodTransactions() {
+        const { start, end } = getDateRange();
+        return dashboardData.transactions.filter((transaction) => {
+          const date = parseDate(transaction.date);
+          return date >= start && date <= end;
+        });
+      }
+
+      function getCategoryName(id) {
+        return dashboardData.categories.find((category) => category.id === id)?.name || "Sans catégorie";
+      }
+
+      function getCategoryColor(id) {
+        const index = dashboardData.categories.findIndex((category) => category.id === id);
+        return palette[(index < 0 ? 0 : index) % palette.length];
+      }
+
+      function renderSummary(transactions, range) {
+        const income = transactions
+          .filter((transaction) => transaction.type === "income")
+          .reduce((sum, transaction) => sum + transaction.amount, 0);
+        const expenses = transactions
+          .filter((transaction) => transaction.type === "expense")
+          .reduce((sum, transaction) => sum + transaction.amount, 0);
+        const balance = income - expenses;
+        const savingsRate = income > 0 ? (balance / income) * 100 : 0;
+        const dayCount = Math.max(1, Math.floor((range.end - range.start) / 86400000) + 1);
+        const incomeCount = transactions.filter((transaction) => transaction.type === "income").length;
+        const expenseCount = transactions.filter((transaction) => transaction.type === "expense").length;
+
+        document.querySelector("#income-total").textContent = formatMoney(income);
+        document.querySelector("#expense-total").textContent = formatMoney(expenses);
+        document.querySelector("#balance-total").textContent = formatMoney(balance);
+        document.querySelector("#balance-total").classList.toggle("negative", balance < 0);
+        document.querySelector("#savings-rate").textContent = `${Math.max(0, Math.round(savingsRate))} %`;
+        document.querySelector("#income-count").textContent = `${incomeCount} revenu${incomeCount === 1 ? "" : "s"} enregistré${incomeCount === 1 ? "" : "s"}`;
+        document.querySelector("#expense-count").textContent = `${expenseCount} dépense${expenseCount === 1 ? "" : "s"} enregistrée${expenseCount === 1 ? "" : "s"}`;
+        document.querySelector("#period-label").textContent = `Résumé financier · ${range.label}`;
+        document.querySelector("#budget-period").textContent = range.label;
+        document.querySelector("#daily-average").textContent = formatMoney(expenses / dayCount);
+      }
+
+      function renderTrendChart(transactions, range) {
+        const count = 6;
+        const duration = Math.max(1, range.end.getTime() - range.start.getTime() + 86400000);
+        const buckets = Array.from({ length: count }, (_, index) => ({
+          income: 0,
+          expenses: 0,
+          date: new Date(range.start.getTime() + (duration * index) / count),
+          transactions: [],
+        }));
+
+        transactions.forEach((transaction) => {
+          const elapsed = parseDate(transaction.date).getTime() - range.start.getTime();
+          const index = Math.min(count - 1, Math.max(0, Math.floor((elapsed / duration) * count)));
+          buckets[index].transactions.push(transaction);
+          if (transaction.type === "income") buckets[index].income += transaction.amount;
+          else buckets[index].expenses += transaction.amount;
+        });
+
+        const peak = Math.max(100, ...buckets.flatMap((bucket) => [bucket.income, bucket.expenses]));
+        const step = Math.ceil(peak / 3 / 100) * 100 || 100;
+        const ceiling = step * 3;
+        const width = 560;
+        const height = 210;
+        const left = 43;
+        const right = 10;
+        const top = 14;
+        const bottom = 27;
+        const plotWidth = width - left - right;
+        const plotHeight = height - top - bottom;
+        const x = (index) => left + (plotWidth * index) / (count - 1);
+        const y = (value) => top + plotHeight - (value / ceiling) * plotHeight;
+        const line = (key) =>
+          buckets.map((bucket, index) => `${index ? "L" : "M"}${x(index)},${y(bucket[key])}`).join(" ");
+
+        const grid = [0, 1, 2, 3]
+          .map((index) => {
+            const value = ceiling - step * index;
+            const position = top + (plotHeight * index) / 3;
+            return `<line class="grid-line" x1="${left}" y1="${position}" x2="${width - right}" y2="${position}"></line><text class="axis-label" x="0" y="${position + 3}">${safeText(formatCompactMoney(value))}</text>`;
+          })
+          .join("");
+        const labels = buckets
+          .map((bucket, index) => {
+            const label = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(bucket.date);
+            return `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 4}">${safeText(label)}</text>`;
+          })
+          .join("");
+        const points = buckets
+          .map(
+            (bucket, index) =>
+              `<circle class="expense-point" data-chart-index="${index}" tabindex="0" role="button" aria-label="Voir les détails du ${safeText(new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long" }).format(bucket.date))}" cx="${x(index)}" cy="${y(bucket.expenses)}" r="4.5"><title>${safeText(formatMoney(bucket.expenses))} de dépenses — cliquer pour le détail</title></circle>`,
+          )
+          .join("");
+
+        document.querySelector("#trend-chart").innerHTML =
+          `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">${grid}<path class="income-line" pathLength="1" d="${line("income")}"></path><path class="expense-line" pathLength="1" d="${line("expenses")}"></path>${points}${labels}</svg>`;
+        document.querySelector("#trend-chart").chartBuckets = buckets;
+      }
+
+      function renderCategories(transactions) {
+        const totals = new Map();
+        const byCategory = new Map();
+        transactions
+          .filter((transaction) => transaction.type === "expense")
+          .forEach((transaction) => {
+            totals.set(transaction.categoryId, (totals.get(transaction.categoryId) || 0) + transaction.amount);
+            const categoryTransactions = byCategory.get(transaction.categoryId) || [];
+            categoryTransactions.push(transaction);
+            byCategory.set(transaction.categoryId, categoryTransactions);
+          });
+        const categoryIds = new Set([
+          ...dashboardData.categories.filter((category) => category.monthlyBudget > 0).map((category) => category.id),
+          ...totals.keys(),
+        ]);
+        const entries = [...categoryIds]
+          .map((id) => [id, totals.get(id) || 0])
+          .sort((a, b) => b[1] - a[1]);
+        const total = entries.reduce((sum, [, amount]) => sum + amount, 0);
+        const circumference = 2 * Math.PI * 61;
+        let offset = 0;
+        const segments = entries
+          .map(([id, amount]) => {
+            if (amount === 0 || total === 0) return "";
+            const length = total > 0 ? (amount / total) * circumference : 0;
+            const segment = `<circle class="donut-segment" data-category-id="${safeText(id)}" tabindex="0" role="button" aria-label="Voir les détails de ${safeText(getCategoryName(id))}" cx="82" cy="82" r="61" stroke="${getCategoryColor(id)}" stroke-dasharray="${length} ${circumference - length}" stroke-dashoffset="${-offset}"><title>${safeText(getCategoryName(id))} : ${safeText(formatMoney(amount))} — cliquer pour le détail</title></circle>`;
+            offset += length;
+            return segment;
+          })
+          .join("");
+        const center = total
+          ? `<div class="donut-center"><span>Total dépensé</span><strong>${safeText(formatCompactMoney(total))}</strong></div>`
+          : '<div class="donut-center"><span>Aucune dépense</span><strong>—</strong></div>';
+
+        document.querySelector("#category-chart").innerHTML =
+          `<svg viewBox="0 0 164 164" aria-hidden="true"><circle class="donut-track" cx="82" cy="82" r="61"></circle>${segments}</svg>${center}`;
+        document.querySelector("#category-legend").innerHTML = entries.length
+          ? entries
+              .map(
+                ([id, amount], index) => {
+                  const purchases = (byCategory.get(id) || []).sort((a, b) => b.date.localeCompare(a.date));
+                  const share = total ? Math.round((amount / total) * 100) : 0;
+                  const purchaseMarkup = purchases.length
+                    ? purchases
+                        .map((transaction) => {
+                          const date = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(parseDate(transaction.date));
+                          return `<button class="category-purchase" type="button" data-transaction-id="${safeText(transaction.id)}"><span>${safeText(transaction.label)} · ${safeText(date)}</span><strong>${safeText(formatMoney(transaction.amount))}</strong></button>`;
+                        })
+                        .join("")
+                    : '<div class="category-purchase"><span>Aucun achat sur cette période</span></div>';
+                  return `<details class="category-accordion" style="--category-color:${getCategoryColor(id)}" ${index === 0 ? "open" : ""}><summary><span class="category-summary-main"><span class="legend-name"><span class="legend-color"></span><span>${safeText(getCategoryName(id))}<small>${purchases.length} achat${purchases.length === 1 ? "" : "s"} · ${share} %</small></span></span></span><span class="category-summary-end"><strong class="legend-amount">${safeText(formatMoney(amount))}</strong><svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary><div class="accordion-content"><div class="accordion-content-inner">${purchaseMarkup}</div></div></details>`;
+                },
+              )
+              .join("")
+          : '<div class="empty-state">Aucune dépense sur cette période.</div>';
+        updateCategoryToggleButton();
+      }
+
+      function updateCategoryToggleButton() {
+        const categories = [...document.querySelectorAll(".category-accordion")];
+        const allOpen = categories.length > 0 && categories.every((category) => category.open);
+        const button = document.querySelector("#toggle-categories");
+        button.textContent = allOpen ? "Tout fermer" : "Tout ouvrir";
+        button.setAttribute("aria-expanded", String(allOpen));
+      }
+
+      function openDetail({ title, description, summaryLabel, total, transactions, budget }) {
+        const dialog = document.querySelector("#detail-dialog");
+        document.querySelector("#detail-title").textContent = title;
+        document.querySelector("#detail-description").textContent = description;
+        document.querySelector("#detail-summary-label").textContent = summaryLabel;
+        document.querySelector("#detail-summary-total").textContent = formatMoney(total);
+
+        const meter = document.querySelector("#detail-budget-meter");
+        meter.hidden = !budget;
+        if (budget) {
+          meter.setAttribute("aria-label", `${Math.round(budget.ratio * 100)} % du budget utilisé`);
+          meter.querySelector("span").style.width = `${Math.min(100, budget.ratio * 100)}%`;
+        }
+
+        const sorted = [...transactions].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+        document.querySelector("#detail-list").innerHTML = sorted.length
+          ? sorted
+              .map((transaction) => {
+                const income = transaction.type === "income";
+                const date = new Intl.DateTimeFormat("fr-FR", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                }).format(parseDate(transaction.date));
+                return `<div class="detail-row"><span class="detail-row-copy"><strong>${safeText(transaction.label)}</strong><span>${safeText(getCategoryName(transaction.categoryId))} · ${safeText(date)} · ${income ? "Revenu" : "Dépense"}</span></span><span class="detail-row-amount ${income ? "income" : ""}">${income ? "+" : "−"}${safeText(formatMoney(transaction.amount))}</span></div>`;
+              })
+              .join("")
+          : '<div class="empty-state">Aucun mouvement sur cette période.</div>';
+
+        if (!dialog.open) dialog.showModal();
+      }
+
+      function openTransactionDetail(transaction) {
+        const income = transaction.type === "income";
+        const date = new Intl.DateTimeFormat("fr-FR", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }).format(parseDate(transaction.date));
+        openDetail({
+          title: transaction.label,
+          description: `${getCategoryName(transaction.categoryId)} · ${date}`,
+          summaryLabel: income ? "Revenu reçu" : "Dépense effectuée",
+          total: transaction.amount,
+          transactions: [transaction],
+        });
+      }
+
+      function openCategoryDetail(categoryId) {
+        const category = dashboardData.categories.find((item) => item.id === categoryId);
+        const transactions = getPeriodTransactions().filter(
+          (transaction) => transaction.categoryId === categoryId && transaction.type === "expense",
+        );
+        const total = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+        const budget = category?.monthlyBudget || 0;
+        openDetail({
+          title: category?.name || "Catégorie",
+          description: `${transactions.length} achat${transactions.length === 1 ? "" : "s"} · ${getDateRange().label}`,
+          summaryLabel: budget ? `Dépenses sur un budget de ${formatMoney(budget)}` : "Total dépensé",
+          total,
+          transactions,
+          budget: budget ? { ratio: total / budget } : null,
+        });
+      }
+
+      function openBudgetDetail(categoryId) {
+        const category = dashboardData.categories.find((item) => item.id === categoryId);
+        if (!category) return;
+        const transactions = getPeriodTransactions().filter(
+          (transaction) => transaction.categoryId === categoryId && transaction.type === "expense",
+        );
+        const total = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+        const ratio = category.monthlyBudget ? total / category.monthlyBudget : 0;
+        const remaining = category.monthlyBudget - total;
+        openDetail({
+          title: `Budget ${category.name}`,
+          description: remaining >= 0
+            ? `${formatMoney(remaining)} disponibles sur la période sélectionnée.`
+            : `Budget dépassé de ${formatMoney(Math.abs(remaining))}.`,
+          summaryLabel: `Dépenses sur ${formatMoney(category.monthlyBudget)} prévus`,
+          total,
+          transactions,
+          budget: { ratio },
+        });
+      }
+
+      function openMetricDetail(type) {
+        const transactions = getPeriodTransactions();
+        if (type === "budgets") {
+          const expenseTransactions = transactions.filter((transaction) => transaction.type === "expense");
+          const total = expenseTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+          const limit = dashboardData.categories
+            .filter((category) => category.monthlyBudget > 0)
+            .reduce((sum, category) => sum + category.monthlyBudget, 0);
+          openDetail({
+            title: "Détail de tous les budgets",
+            description: `Dépenses par catégorie · ${getDateRange().label}`,
+            summaryLabel: `Dépenses sur ${formatMoney(limit)} prévus`,
+            total,
+            transactions: expenseTransactions,
+            budget: limit ? { ratio: total / limit } : null,
+          });
+          return;
+        }
+
+        const metricDetails = {
+          income: {
+            title: "Détail des revenus",
+            label: "Total des revenus",
+            matches: (transaction) => transaction.type === "income",
+            amount: (items) => items.reduce((sum, transaction) => sum + transaction.amount, 0),
+          },
+          expense: {
+            title: "Détail des dépenses",
+            label: "Total des dépenses",
+            matches: (transaction) => transaction.type === "expense",
+            amount: (items) => items.reduce((sum, transaction) => sum + transaction.amount, 0),
+          },
+          balance: {
+            title: "Détail du solde disponible",
+            label: "Revenus moins dépenses",
+            matches: () => true,
+            amount: (items) => items.reduce(
+              (sum, transaction) => sum + (transaction.type === "income" ? transaction.amount : -transaction.amount),
+              0,
+            ),
+          },
+          savings: {
+            title: "Épargne potentielle",
+            label: "Montant non dépensé",
+            matches: () => true,
+            amount: (items) => items.reduce(
+              (sum, transaction) => sum + (transaction.type === "income" ? transaction.amount : -transaction.amount),
+              0,
+            ),
+          },
+        };
+        const detail = metricDetails[type];
+        if (!detail) return;
+        const items = transactions.filter(detail.matches);
+        const total = detail.amount(items);
+        openDetail({
+          title: detail.title,
+          description: `Transactions incluses · ${getDateRange().label}`,
+          summaryLabel: detail.label,
+          total,
+          transactions: items,
+        });
+      }
+
+      function openChartBucketDetail(index) {
+        const bucket = document.querySelector("#trend-chart").chartBuckets?.[index];
+        if (!bucket) return;
+        const date = new Intl.DateTimeFormat("fr-FR", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }).format(bucket.date);
+        const net = bucket.income - bucket.expenses;
+        openDetail({
+          title: `Détail du ${date}`,
+          description: "Revenus et dépenses de ce point du graphique.",
+          summaryLabel: `Solde · ${formatMoney(bucket.income)} de revenus − ${formatMoney(bucket.expenses)} de dépenses`,
+          total: net,
+          transactions: bucket.transactions,
+        });
+      }
+
+      function handleDetailClick(event) {
+        const transactionRow = event.target.closest("[data-transaction-id]");
+        if (transactionRow) {
+          const transaction = dashboardData.transactions.find(
+            (item) => item.id === transactionRow.dataset.transactionId,
+          );
+          if (transaction) openTransactionDetail(transaction);
+          return;
+        }
+
+        const categorySegment = event.target.closest("[data-category-id]");
+        if (categorySegment && categorySegment.classList.contains("donut-segment")) {
+          openCategoryDetail(categorySegment.dataset.categoryId);
+          return;
+        }
+
+        const budgetRow = event.target.closest("[data-category-id]");
+        if (budgetRow) {
+          openBudgetDetail(budgetRow.dataset.categoryId);
+          return;
+        }
+
+        const chartPoint = event.target.closest("[data-chart-index]");
+        if (chartPoint) openChartBucketDetail(Number(chartPoint.dataset.chartIndex));
+      }
+
+      function renderBudgets(transactions) {
+        const spent = new Map();
+        transactions
+          .filter((transaction) => transaction.type === "expense")
+          .forEach((transaction) => {
+            spent.set(transaction.categoryId, (spent.get(transaction.categoryId) || 0) + transaction.amount);
+          });
+        const expenseCategories = dashboardData.categories.filter((category) => category.monthlyBudget > 0);
+        const totalSpent = expenseCategories.reduce((sum, category) => sum + (spent.get(category.id) || 0), 0);
+        const totalBudget = expenseCategories.reduce((sum, category) => sum + category.monthlyBudget, 0);
+
+        document.querySelector("#budget-spent").textContent = formatMoney(totalSpent);
+        document.querySelector("#budget-limit").textContent = `sur ${formatMoney(totalBudget)} prévus`;
+        const modifiers = ["", "orange", "blue", "purple", "red"];
+        document.querySelector("#budget-list").innerHTML = expenseCategories.length
+          ? expenseCategories
+              .map((category, index) => {
+                const amount = spent.get(category.id) || 0;
+                const ratio = category.monthlyBudget > 0 ? amount / category.monthlyBudget : 0;
+                const width = Math.min(100, ratio * 100);
+                const over = ratio > 1;
+                const modifier = over ? "red" : modifiers[index % modifiers.length];
+                return `<button class="budget-item" type="button" data-category-id="${safeText(category.id)}" aria-label="Voir le détail du budget ${safeText(category.name)}"><span class="budget-meta"><span>${safeText(category.name)}</span><strong class="${over ? "over" : ""}">${safeText(formatMoney(amount))} <span style="color:#a0aaa4;font-weight:450">/ ${safeText(formatMoney(category.monthlyBudget))}</span></strong></span><span class="progress-track" role="progressbar" aria-label="Budget ${safeText(category.name)}" aria-valuenow="${Math.round(Math.min(100, ratio * 100))}" aria-valuemin="0" aria-valuemax="100"><span class="progress-fill ${modifier}" style="display:block;width:${width}%"></span></span></button>`;
+              })
+              .join("")
+          : '<div class="empty-state">Aucun budget défini dans les données.</div>';
+      }
+
+      function categoryIcon(categoryId) {
+        return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">${categoryIcons[categoryId] || categoryIcons.autres}</svg>`;
+      }
+
+      function getVisibleTransactions(transactions) {
+        return [...transactions]
+          .filter((transaction) => selectedCategory === "all" || transaction.categoryId === selectedCategory)
+          .filter((transaction) => {
+            const query = searchTerm.trim().toLocaleLowerCase("fr");
+            return (
+              !query ||
+              transaction.label.toLocaleLowerCase("fr").includes(query) ||
+              getCategoryName(transaction.categoryId).toLocaleLowerCase("fr").includes(query)
+            );
+          })
+          .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+      }
+
+      function renderTransactions(transactions) {
+        visibleTransactions = getVisibleTransactions(transactions);
+        document.querySelector("#transaction-count").textContent =
+          `${visibleTransactions.length} transaction${visibleTransactions.length === 1 ? "" : "s"} · ${getDateRange().label}`;
+        const list = document.querySelector("#transactions-list");
+        const items = showAllTransactions ? visibleTransactions : visibleTransactions.slice(0, 7);
+        list.innerHTML = items.length
+          ? items
+              .map((transaction) => {
+                const income = transaction.type === "income";
+                const date = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(parseDate(transaction.date));
+                return `<button class="transaction-row" type="button" data-transaction-id="${safeText(transaction.id)}" aria-label="Voir le détail de ${safeText(transaction.label)}, ${safeText(formatMoney(transaction.amount))}"><span class="transaction-main"><span class="transaction-icon">${categoryIcon(transaction.categoryId)}</span><span class="transaction-copy"><strong>${safeText(transaction.label)}</strong><span>${safeText(getCategoryName(transaction.categoryId))} · ${safeText(date)}</span></span></span><span class="transaction-amount ${income ? "income" : "expense"}">${income ? "+" : "−"}${safeText(formatMoney(transaction.amount))}</span></button>`;
+              })
+              .join("")
+          : '<div class="empty-state">Aucune transaction ne correspond à cette recherche.</div>';
+        const showMore = document.querySelector("#show-more");
+        showMore.hidden = visibleTransactions.length <= 7;
+        showMore.textContent = showAllTransactions
+          ? "Afficher moins"
+          : `Afficher les ${visibleTransactions.length - 7} autres`;
+      }
+
+      function renderCategoryOptions() {
+        const filter = document.querySelector("#category-filter");
+        filter.innerHTML =
+          '<option value="all">Toutes catégories</option>' +
+          dashboardData.categories
+            .map((category) => `<option value="${safeText(category.id)}">${safeText(category.name)}</option>`)
+            .join("");
+      }
+
+      function renderDashboard() {
+        const range = getDateRange();
+        const transactions = getPeriodTransactions();
+        renderSummary(transactions, range);
+        renderTrendChart(transactions, range);
+        renderCategories(transactions);
+        renderBudgets(transactions);
+        renderTransactions(transactions);
+      }
+
+      function downloadCsv() {
+        const rows = [
+          ["Date", "Libellé", "Catégorie", "Type", "Montant"],
+          ...visibleTransactions.map((transaction) => [
+            transaction.date,
+            transaction.label,
+            getCategoryName(transaction.categoryId),
+            transaction.type === "income" ? "Revenu" : "Dépense",
+            transaction.amount.toFixed(2).replace(".", ","),
+          ]),
+        ];
+        const csv = rows.map((row) => row.map((field) => `"${String(field).replaceAll('"', '""')}"`).join(";")).join("\r\n");
+        const url = URL.createObjectURL(new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "transactions-fictives.csv";
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function validateData(data) {
+        if (!data || !Array.isArray(data.categories) || !Array.isArray(data.transactions) || !data.period?.start || !data.period?.end) {
+          throw new Error("Le format de data.json ne contient pas les catégories, transactions et dates attendues.");
+        }
+        const categoryIds = new Set(data.categories.map((category) => category.id));
+        const invalidTransaction = data.transactions.find(
+          (transaction) =>
+            !categoryIds.has(transaction.categoryId) ||
+            !Number.isFinite(transaction.amount) ||
+            !["income", "expense"].includes(transaction.type),
+        );
+        if (invalidTransaction) {
+          throw new Error(`Transaction invalide dans data.json : ${invalidTransaction.id || invalidTransaction.label}.`);
+        }
+        return data;
+      }
+
+      async function loadData() {
+        const fallback = window.DASHBOARD_DATA;
+        if (location.protocol === "file:") {
+          if (!fallback) throw new Error("Le fichier data.js contenant les données de démonstration est introuvable.");
+          return validateData(fallback);
+        }
+
+        try {
+          const response = await fetch("./data.json", { cache: "no-store" });
+          if (!response.ok) throw new Error(`Impossible de charger data.json (HTTP ${response.status}).`);
+          return validateData(await response.json());
+        } catch (error) {
+          if (fallback) {
+            console.warn("Chargement de data.json impossible, utilisation des données de secours intégrées à data.js.", error);
+            return validateData(fallback);
+          }
+          throw error;
+        }
+      }
+
+      async function startDashboard() {
+        try {
+          dashboardData = await loadData();
+          renderCategoryOptions();
+          renderDashboard();
+          document.querySelector("#period-select").addEventListener("change", (event) => {
+            selectedPeriod = event.target.value;
+            showAllTransactions = false;
+            renderDashboard();
+          });
+          document.querySelector("#category-filter").addEventListener("change", (event) => {
+            selectedCategory = event.target.value;
+            showAllTransactions = false;
+            renderTransactions(getPeriodTransactions());
+          });
+          document.querySelector("#search-input").addEventListener("input", (event) => {
+            searchTerm = event.target.value;
+            showAllTransactions = false;
+            renderTransactions(getPeriodTransactions());
+          });
+          document.querySelector("#show-more").addEventListener("click", () => {
+            showAllTransactions = !showAllTransactions;
+            renderTransactions(getPeriodTransactions());
+          });
+          document.querySelector("#toggle-categories").addEventListener("click", () => {
+            const categories = [...document.querySelectorAll(".category-accordion")];
+            const openAll = !categories.every((category) => category.open);
+            categories.forEach((category) => {
+              category.open = openAll;
+            });
+            updateCategoryToggleButton();
+          });
+          document.querySelector("#category-legend").addEventListener(
+            "toggle",
+            updateCategoryToggleButton,
+            true,
+          );
+          document.querySelectorAll(".kpi-card[data-detail-type]").forEach((card) => {
+            card.addEventListener("click", () => openMetricDetail(card.dataset.detailType));
+            card.addEventListener("keydown", (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                openMetricDetail(card.dataset.detailType);
+              }
+            });
+          });
+          document.querySelector("#budget-total-detail").addEventListener("click", () => {
+            openMetricDetail("budgets");
+          });
+          document.addEventListener("click", handleDetailClick);
+          document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && document.querySelector("#detail-dialog").open) {
+              document.querySelector("#detail-dialog").close();
+              return;
+            }
+            if (event.key !== "Enter" && event.key !== " ") return;
+            const interactiveChartItem = event.target.closest(".expense-point, .donut-segment");
+            if (interactiveChartItem) {
+              event.preventDefault();
+              interactiveChartItem.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+            }
+          });
+          document.querySelector("#detail-close").addEventListener("click", () => {
+            document.querySelector("#detail-dialog").close();
+          });
+          document.querySelector("#detail-dialog").addEventListener("click", (event) => {
+            if (event.target === event.currentTarget) event.currentTarget.close();
+          });
+          document.querySelector("#export-button").addEventListener("click", downloadCsv);
+        } catch (error) {
+          console.error("Could not start dashboard:", error);
+          const banner = document.querySelector("#load-error");
+          banner.textContent = `Impossible de charger le tableau de bord : ${error.message}`;
+          banner.hidden = false;
+        }
+      }
+
+      startDashboard();
+    </script>
+  </body>
+</html>
