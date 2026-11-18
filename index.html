@@ -230,6 +230,34 @@
         text-decoration: none;
       }
 
+      .nav-link-label {
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+
+      .nav-badge {
+        display: inline-flex;
+        min-width: 22px;
+        height: 22px;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        padding: 0 6px;
+        border: 1px solid rgb(255 255 255 / 12%);
+        border-radius: 999px;
+        background: rgb(255 255 255 / 8%);
+        color: #ddd6f6;
+        font-size: 9px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .nav-link.active .nav-badge {
+        border-color: rgb(255 255 255 / 18%);
+        background: rgb(255 255 255 / 17%);
+        color: white;
+      }
+
       .nav-link:hover,
       .nav-link.active {
         background: var(--mint);
@@ -248,8 +276,51 @@
 
       .sidebar-bottom {
         display: grid;
-        gap: 19px;
+        gap: 14px;
         margin-top: auto;
+      }
+
+      .sidebar-quick-actions {
+        display: grid;
+        gap: 8px;
+      }
+
+      .sidebar-action {
+        display: flex;
+        min-height: 42px;
+        align-items: center;
+        gap: 10px;
+        padding: 0 11px;
+        border: 1px solid rgb(255 255 255 / 12%);
+        border-radius: 11px;
+        background: rgb(255 255 255 / 7%);
+        color: #eeeaff;
+        font-size: 11px;
+        font-weight: 650;
+        text-align: left;
+        transition: background 160ms ease, transform 160ms ease;
+      }
+
+      .sidebar-action:hover {
+        transform: translateX(2px);
+        background: rgb(255 255 255 / 13%);
+      }
+
+      .sidebar-action svg {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 auto;
+        color: #c4b5fd;
+      }
+
+      .sidebar-action.primary {
+        border-color: transparent;
+        background: linear-gradient(105deg, #ff9d59, #ff7188);
+        color: #3a1c51;
+      }
+
+      .sidebar-action.primary svg {
+        color: #542852;
       }
 
       .tip-card {
@@ -610,8 +681,13 @@
       .bottom-grid {
         display: grid;
         grid-template-columns: minmax(0, 1.6fr) minmax(270px, 0.9fr);
+        align-items: start;
         gap: 15px;
         margin-bottom: 15px;
+      }
+
+      .content-grid {
+        grid-template-columns: minmax(0, 1fr);
       }
 
       .chart-card,
@@ -622,8 +698,39 @@
         padding: 19px;
       }
 
+      .chart-card {
+        padding: 23px 26px 20px;
+      }
+
+      .chart-card .card-heading {
+        gap: 18px;
+      }
+
+      .chart-card .legend {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .chart-card .legend-item {
+        padding: 7px 10px;
+        border: 1px solid #efedf4;
+        border-radius: 999px;
+        background: #fbfaff;
+        color: #665f7b;
+        font-size: 10px;
+      }
+
       .category-card {
+        display: grid;
+        grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+        align-items: center;
+        column-gap: 28px;
         overflow: hidden;
+      }
+
+      .category-card > .card-heading {
+        grid-column: 1 / -1;
       }
 
       .card-title {
@@ -660,8 +767,9 @@
       }
 
       .chart-wrap {
-        height: 215px;
-        margin-top: 19px;
+        position: relative;
+        height: clamp(310px, 34vw, 430px);
+        margin-top: 24px;
       }
 
       .chart-wrap svg {
@@ -672,15 +780,15 @@
       }
 
       .grid-line {
-        stroke: #edf0ec;
-        stroke-dasharray: 4 5;
+        stroke: #eeeaf5;
+        stroke-dasharray: 3 6;
         stroke-width: 1;
       }
 
       .axis-label {
-        fill: #a0aaa3;
+        fill: #918ba3;
         font-family: inherit;
-        font-size: 9px;
+        font-size: 11px;
       }
 
       .income-line,
@@ -688,31 +796,108 @@
         fill: none;
         stroke-linecap: round;
         stroke-linejoin: round;
-        stroke-width: 2.5;
+        stroke-width: 3.5;
+        pointer-events: none;
       }
 
       .income-line {
-        stroke: #d4e4d7;
+        stroke: #1bb99b;
       }
 
       .expense-line {
-        stroke: var(--green);
+        stroke: #7251ee;
       }
 
       .expense-point {
         fill: white;
-        stroke: var(--green);
-        stroke-width: 2;
-        cursor: pointer;
+        stroke: #7251ee;
+        stroke-width: 2.5;
+        pointer-events: none;
+      }
+
+      .chart-area {
+        pointer-events: none;
+      }
+
+      .chart-tooltip {
+        position: absolute;
+        z-index: 2;
+        display: grid;
+        min-width: 170px;
+        gap: 7px;
+        padding: 11px 13px;
+        border: 1px solid #e8e1f3;
+        border-radius: 12px;
+        background: rgb(255 255 255 / 96%);
+        box-shadow: 0 12px 30px rgb(42 29 80 / 14%);
+        color: var(--ink);
+        pointer-events: none;
+        transform: translate(-50%, calc(-100% - 12px));
+      }
+
+      .chart-tooltip[hidden] {
+        display: none;
+      }
+
+      .chart-tooltip strong {
+        font-size: 11px;
+        font-weight: 750;
+      }
+
+      .chart-tooltip span {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        color: #77718d;
+        font-size: 10px;
+      }
+
+      .chart-tooltip span strong {
+        color: var(--ink);
+        font-size: 10px;
+      }
+
+      .chart-tooltip .tooltip-income::before,
+      .chart-tooltip .tooltip-expense::before {
+        width: 7px;
+        height: 7px;
+        flex: 0 0 auto;
+        border-radius: 50%;
+        content: "";
+      }
+
+      .chart-tooltip .tooltip-income::before {
+        background: #1bb99b;
+      }
+
+      .chart-tooltip .tooltip-expense::before {
+        background: #7251ee;
+      }
+
+      .month-guide {
+        stroke: #f2eff7;
+        stroke-width: 1;
+        pointer-events: none;
+      }
+
+      .chart-tooltip .tooltip-income,
+      .chart-tooltip .tooltip-expense {
+        justify-content: flex-start;
+      }
+
+      .chart-tooltip .tooltip-income strong,
+      .chart-tooltip .tooltip-expense strong {
+        margin-left: auto;
       }
 
       .chart-insight {
         display: flex;
         align-items: center;
-        gap: 5px;
-        margin-top: 6px;
-        color: #98a29c;
-        font-size: 9px;
+        gap: 7px;
+        margin-top: 10px;
+        color: #89839f;
+        font-size: 11px;
       }
 
       .chart-insight strong {
@@ -772,7 +957,10 @@
       .category-legend {
         display: grid;
         gap: 5px;
-        margin-top: 12px;
+        grid-column: 2;
+        grid-row: 2;
+        width: 100%;
+        margin-top: 0;
       }
 
       .category-accordion {
@@ -983,7 +1171,7 @@
 
       .budget-list {
         display: grid;
-        gap: 14px;
+        gap: 18px;
       }
 
       .budget-alerts {
@@ -1021,8 +1209,10 @@
       }
 
       .budget-item {
+        display: grid;
         width: 100%;
         padding: 0;
+        gap: 7px;
         border: 0;
         background: transparent;
         color: inherit;
@@ -1040,9 +1230,12 @@
 
       .budget-meta {
         gap: 8px;
-        margin-bottom: 7px;
         color: #78857e;
         font-size: 9px;
+      }
+
+      .budget-meta > span {
+        min-width: 0;
       }
 
       .budget-meta strong {
@@ -1057,6 +1250,8 @@
       }
 
       .progress-track {
+        display: block;
+        width: 100%;
         height: 5px;
         overflow: hidden;
         border-radius: 50px;
@@ -1083,10 +1278,6 @@
 
       .progress-fill.red {
         background: var(--red);
-      }
-
-      .transactions-card {
-        grid-column: 1 / -1;
       }
 
       .transaction-tools {
@@ -1132,10 +1323,13 @@
       }
 
       .transaction-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) max-content;
         min-height: 57px;
         width: 100%;
         gap: 12px;
-        padding: 0;
+        padding: 7px 4px;
+        border: 0;
         border-top: 1px solid #f0f2ef;
         background: transparent;
         color: inherit;
@@ -1195,16 +1389,22 @@
 
       .transaction-amount {
         flex: 0 0 auto;
+        padding: 6px 9px;
+        border-radius: 9px;
+        background: #f5f2fd;
         font-size: 10px;
         font-weight: 720;
+        white-space: nowrap;
       }
 
       .transaction-amount.income {
         color: var(--green);
+        background: #eaf8f3;
       }
 
       .transaction-amount.expense {
         color: var(--ink);
+        background: #fff0f3;
       }
 
       .empty-state {
@@ -1320,7 +1520,7 @@
         }
 
         .content-grid {
-          grid-template-columns: minmax(0, 1.25fr) minmax(230px, 0.85fr);
+          grid-template-columns: minmax(0, 1fr);
         }
 
         .chart-card,
@@ -1335,6 +1535,36 @@
         .content-grid,
         .bottom-grid {
           grid-template-columns: 1fr;
+        }
+
+        .chart-card {
+          padding: 17px;
+        }
+
+        .chart-card .card-heading {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .chart-card .legend {
+          justify-content: flex-start;
+        }
+
+        .category-card {
+          grid-template-columns: minmax(0, 1fr);
+          row-gap: 0;
+        }
+
+        .category-card > .card-heading,
+        .category-card > .donut-wrap,
+        .category-card > .category-legend {
+          grid-column: 1;
+          grid-row: auto;
+        }
+
+        .category-card > .category-legend {
+          margin-top: 12px;
         }
 
         .transactions-card {
@@ -1739,6 +1969,30 @@
         gap: 17px;
       }
 
+      .bottom-grid {
+        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+        align-items: start;
+      }
+
+      .transactions-card .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .transactions-card .transaction-tools {
+        width: 100%;
+      }
+
+      .transactions-card .search-wrap {
+        flex: 1 1 120px;
+        min-width: 0;
+      }
+
+      .transactions-card .search-input {
+        width: 100%;
+      }
+
       .card-title {
         color: #2a2050;
         font-size: 13px;
@@ -1781,8 +2035,40 @@
         fill: #ff9e59;
       }
 
+      .income-point {
+        fill: #31c7ae;
+        stroke: white;
+        stroke-width: 2;
+        pointer-events: none;
+      }
+
+      .income-point:hover {
+        r: 6px;
+        fill: #ff9e59;
+      }
+
+      .chart-hit-area {
+        fill: transparent;
+        pointer-events: all;
+        cursor: pointer;
+      }
+
+      .chart-hit-area:focus-visible {
+        fill: rgb(114 81 238 / 8%);
+        outline: 2px solid #ffab5d;
+        outline-offset: -2px;
+      }
+
       .chart-insight strong {
         color: #6951e8;
+      }
+
+      .chart-insight::before {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #ff9a4c;
+        content: "";
       }
 
       .donut-segment {
@@ -1807,6 +2093,11 @@
       .transaction-row {
         border-color: #f0edf5;
         animation: row-arrive 320ms both;
+      }
+
+      .transaction-row:hover {
+        padding-right: 10px;
+        padding-left: 10px;
       }
 
       .transaction-row:nth-child(2) {
@@ -1882,7 +2173,7 @@
       }
 
       .progress-track {
-        height: 7px;
+        height: 4px;
         background: #f0edf6;
       }
 
@@ -2190,38 +2481,45 @@
           <p class="nav-title">Espace personnel</p>
           <ul class="nav-list">
             <li>
-              <a class="nav-link active" href="#overview" aria-current="page">
+              <a class="nav-link active" href="#overview" aria-current="page" data-nav-target="overview">
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7" /><rect x="13.5" y="3.5" width="7" height="4" rx="1.5" stroke="currentColor" stroke-width="1.7" /><rect x="13.5" y="10.5" width="7" height="10" rx="1.5" stroke="currentColor" stroke-width="1.7" /><rect x="3.5" y="13.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7" /></svg>
-                Vue d'ensemble
+                <span class="nav-link-label">Vue d'ensemble</span>
+                <span class="nav-badge" id="nav-overview-balance" aria-label="Solde">—</span>
               </a>
             </li>
             <li>
-              <a class="nav-link" href="#transactions">
+              <a class="nav-link" href="#transactions" data-nav-target="transactions">
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /><circle cx="18" cy="17" r="2" stroke="currentColor" stroke-width="1.7" /></svg>
-                Transactions
+                <span class="nav-link-label">Transactions</span>
+                <span class="nav-badge" id="nav-transaction-count">0</span>
               </a>
             </li>
             <li>
-              <a class="nav-link" href="#budgets">
+              <a class="nav-link" href="#budgets" data-nav-target="budgets">
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
-                Budgets
+                <span class="nav-link-label">Budgets</span>
+                <span class="nav-badge" id="nav-budget-alert-count">0</span>
               </a>
             </li>
             <li>
-              <a class="nav-link" href="#categories">
+              <a class="nav-link" href="#categories" data-nav-target="categories">
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5v8.7l7.5 4.3A8.5 8.5 0 1 1 12 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /><path d="M15.5 4.3a8.6 8.6 0 0 1 5.2 8.2h-8.2V4.3h3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /></svg>
-                Catégories
+                <span class="nav-link-label">Catégories</span>
+                <span class="nav-badge" id="nav-category-count">0</span>
               </a>
             </li>
           </ul>
         </nav>
         <div class="sidebar-bottom">
-          <div class="tip-card">
-            <span class="tip-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M9 18h6m-5 3h4m-5.8-6.2A6.5 6.5 0 1 1 15.8 15c-.8.6-1.3 1.3-1.5 2h-4.6c-.2-.7-.7-1.4-1.5-2Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            </span>
-            <strong>Un budget à votre rythme</strong>
-            <p>Les barres de progression suivent les limites définies pour chaque catégorie.</p>
+          <div class="sidebar-quick-actions" aria-label="Actions rapides">
+            <button class="sidebar-action primary" id="quick-add-expense" type="button">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Ajouter une dépense
+            </button>
+            <button class="sidebar-action" id="quick-add-income" type="button">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Ajouter un revenu
+            </button>
           </div>
           <div class="profile">
             <span class="avatar" aria-hidden="true">SC</span>
@@ -2295,14 +2593,14 @@
         <section class="content-grid" aria-label="Graphiques financiers">
           <article class="card chart-card">
             <div class="card-heading">
-              <div><h2 class="card-title">Revenus & dépenses</h2><p class="card-subtitle">Évolution sur la période sélectionnée</p></div>
+              <div><h2 class="card-title">Revenus & dépenses</h2><p class="card-subtitle" id="chart-period">Évolution mensuelle sur 12 mois · cliquez sur un mois pour voir le détail</p></div>
               <div class="legend" aria-label="Légende">
-                <span class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Dépenses</span>
-                <span class="legend-item"><span class="legend-dot" style="background:#d4e4d7"></span>Revenus</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#7251ee"></span>Dépenses</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#1bb99b"></span>Revenus</span>
               </div>
             </div>
-            <div class="chart-wrap" id="trend-chart" role="group" aria-label="Graphique des revenus et dépenses dans le temps"></div>
-            <div class="chart-insight"><strong id="daily-average">—</strong><span>de dépenses en moyenne par jour</span></div>
+            <div class="chart-wrap" id="trend-chart" role="group" aria-label="Graphique mensuel des revenus et dépenses sur douze mois"></div>
+            <div class="chart-insight"><strong id="daily-average">—</strong><span>de dépenses mensuelles en moyenne sur 12 mois</span></div>
           </article>
 
           <article class="card category-card" id="categories">
@@ -2487,6 +2785,83 @@
         document.querySelector("#reset-data").hidden = !hasSavedChanges;
       }
 
+      function updateSidebarSummary(transactions) {
+        const income = transactions
+          .filter((transaction) => transaction.type === "income")
+          .reduce((sum, transaction) => sum + transaction.amount, 0);
+        const expensesByCategory = new Map();
+        transactions
+          .filter((transaction) => transaction.type === "expense")
+          .forEach((transaction) => {
+            expensesByCategory.set(
+              transaction.categoryId,
+              (expensesByCategory.get(transaction.categoryId) || 0) + transaction.amount,
+            );
+          });
+        const alertCount = dashboardData.categories.filter((category) => {
+          if (category.monthlyBudget <= 0) return false;
+          return (expensesByCategory.get(category.id) || 0) / category.monthlyBudget >= 0.8;
+        }).length;
+        document.querySelector("#nav-overview-balance").textContent =
+          formatCompactMoney(income - [...expensesByCategory.values()].reduce((sum, amount) => sum + amount, 0));
+        document.querySelector("#nav-overview-balance").setAttribute(
+          "aria-label",
+          `Solde de la période : ${formatMoney(income - [...expensesByCategory.values()].reduce((sum, amount) => sum + amount, 0))}`,
+        );
+        document.querySelector("#nav-transaction-count").textContent = String(transactions.length);
+        document.querySelector("#nav-transaction-count").setAttribute(
+          "aria-label",
+          `${transactions.length} transaction${transactions.length === 1 ? "" : "s"} sur la période`,
+        );
+        document.querySelector("#nav-budget-alert-count").textContent = String(alertCount);
+        document.querySelector("#nav-budget-alert-count").setAttribute(
+          "aria-label",
+          `${alertCount} alerte${alertCount === 1 ? "" : "s"} budget`,
+        );
+        const categoryCount = dashboardData.categories.filter((category) => category.id !== "revenus").length;
+        document.querySelector("#nav-category-count").textContent = String(categoryCount);
+        document.querySelector("#nav-category-count").setAttribute(
+          "aria-label",
+          `${categoryCount} catégories de dépenses`,
+        );
+      }
+
+      function setActiveNavigation(targetId) {
+        document.querySelectorAll(".nav-link[data-nav-target]").forEach((link) => {
+          const active = link.dataset.navTarget === targetId;
+          link.classList.toggle("active", active);
+          if (active) link.setAttribute("aria-current", "page");
+          else link.removeAttribute("aria-current");
+        });
+      }
+
+      function setupSectionNavigation() {
+        const links = [...document.querySelectorAll(".nav-link[data-nav-target]")];
+        links.forEach((link) => {
+          link.addEventListener("click", () => setActiveNavigation(link.dataset.navTarget));
+        });
+        if (!("IntersectionObserver" in window)) return;
+
+        const sectionIds = links
+          .map((link) => link.dataset.navTarget)
+          .filter((id) => id !== "overview");
+        const observer = new IntersectionObserver(
+          (entries) => {
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+            const activeTarget = document.querySelector(".nav-link.active")?.dataset.navTarget;
+            const currentSection = visible.find((entry) => entry.target.id === activeTarget);
+            setActiveNavigation(currentSection?.target.id || visible[0]?.target.id || "overview");
+          },
+          { rootMargin: "-18% 0px -68% 0px", threshold: [0, 0.1, 0.35, 0.65, 1] },
+        );
+        sectionIds.forEach((id) => {
+          const section = document.getElementById(id);
+          if (section) observer.observe(section);
+        });
+      }
+
       function applySavedChanges(baseData) {
         let raw;
         try {
@@ -2658,63 +3033,131 @@
         document.querySelector("#daily-average").textContent = formatMoney(expenses / dayCount);
       }
 
-      function renderTrendChart(transactions, range) {
-        const count = 6;
-        const duration = Math.max(1, range.end.getTime() - range.start.getTime() + 86400000);
+      function renderTrendChart() {
+        const transactions = dashboardData.transactions;
+        const periodEnd = parseDate(dashboardData.period.end);
+        const chartStart = new Date(periodEnd.getFullYear(), periodEnd.getMonth() - 11, 1, 12);
+        const chartEnd = new Date(periodEnd.getFullYear(), periodEnd.getMonth() + 1, 0, 12);
+        const count = 12;
         const buckets = Array.from({ length: count }, (_, index) => ({
           income: 0,
           expenses: 0,
-          date: new Date(range.start.getTime() + (duration * index) / count),
+          date: new Date(chartStart.getFullYear(), chartStart.getMonth() + index, 15, 12),
           transactions: [],
         }));
 
         transactions.forEach((transaction) => {
-          const elapsed = parseDate(transaction.date).getTime() - range.start.getTime();
-          const index = Math.min(count - 1, Math.max(0, Math.floor((elapsed / duration) * count)));
+          const date = parseDate(transaction.date);
+          const index = (date.getFullYear() - chartStart.getFullYear()) * 12 + date.getMonth() - chartStart.getMonth();
+          if (date < chartStart || date > chartEnd || index < 0 || index >= count) return;
           buckets[index].transactions.push(transaction);
           if (transaction.type === "income") buckets[index].income += transaction.amount;
           else buckets[index].expenses += transaction.amount;
         });
 
         const peak = Math.max(100, ...buckets.flatMap((bucket) => [bucket.income, bucket.expenses]));
-        const step = Math.ceil(peak / 3 / 100) * 100 || 100;
-        const ceiling = step * 3;
-        const width = 560;
-        const height = 210;
-        const left = 43;
-        const right = 10;
-        const top = 14;
-        const bottom = 27;
+        const step = Math.ceil(peak / 4 / 100) * 100 || 100;
+        const ceiling = step * 4;
+        const width = 1000;
+        const height = 380;
+        const left = 76;
+        const right = 22;
+        const top = 24;
+        const bottom = 48;
         const plotWidth = width - left - right;
         const plotHeight = height - top - bottom;
         const x = (index) => left + (plotWidth * index) / (count - 1);
         const y = (value) => top + plotHeight - (value / ceiling) * plotHeight;
-        const line = (key) =>
-          buckets.map((bucket, index) => `${index ? "L" : "M"}${x(index)},${y(bucket[key])}`).join(" ");
+        const line = (key) => {
+          const points = buckets.map((bucket, index) => ({ x: x(index), y: y(bucket[key]) }));
+          return points.reduce((path, point, index) => {
+            if (index === 0) return `M${point.x},${point.y}`;
+            const previous = points[index - 1];
+            const beforePrevious = points[Math.max(0, index - 2)];
+            const next = points[Math.min(points.length - 1, index + 1)];
+            const controlOne = {
+              x: previous.x + (point.x - beforePrevious.x) / 6,
+              y: previous.y + (point.y - beforePrevious.y) / 6,
+            };
+            const controlTwo = {
+              x: point.x - (next.x - previous.x) / 6,
+              y: point.y - (next.y - previous.y) / 6,
+            };
+            return `${path} C${controlOne.x},${controlOne.y} ${controlTwo.x},${controlTwo.y} ${point.x},${point.y}`;
+          }, "");
+        };
+        const area = (key) => `${line(key)} L${x(count - 1)},${y(0)} L${x(0)},${y(0)} Z`;
 
-        const grid = [0, 1, 2, 3]
+        const hitAreas = buckets
+          .map((bucket, index) => {
+            const startX = index === 0 ? left : (x(index - 1) + x(index)) / 2;
+            const endX = index === count - 1 ? width - right : (x(index) + x(index + 1)) / 2;
+            const label = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(bucket.date);
+            return `<rect class="chart-hit-area" data-chart-index="${index}" tabindex="0" role="button" aria-describedby="chart-tooltip" aria-label="Voir les détails de ${safeText(label)}" x="${startX}" y="${top}" width="${endX - startX}" height="${plotHeight}"><title>${safeText(label)} — cliquer pour voir les opérations</title></rect>`;
+          })
+          .join("");
+        const grid = Array.from({ length: 5 }, (_, index) => index)
           .map((index) => {
             const value = ceiling - step * index;
-            const position = top + (plotHeight * index) / 3;
-            return `<line class="grid-line" x1="${left}" y1="${position}" x2="${width - right}" y2="${position}"></line><text class="axis-label" x="0" y="${position + 3}">${safeText(formatCompactMoney(value))}</text>`;
+            const position = top + (plotHeight * index) / 4;
+            return `<line class="grid-line" x1="${left}" y1="${position}" x2="${width - right}" y2="${position}"></line><text class="axis-label" text-anchor="end" x="${left - 14}" y="${position + 4}">${safeText(formatCompactMoney(value))}</text>`;
           })
+          .join("");
+        const monthGuides = buckets
+          .map((bucket, index) =>
+            `<line class="month-guide" x1="${x(index)}" y1="${top}" x2="${x(index)}" y2="${top + plotHeight}"></line>`,
+          )
           .join("");
         const labels = buckets
           .map((bucket, index) => {
-            const label = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(bucket.date);
-            return `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 4}">${safeText(label)}</text>`;
+            const label = new Intl.DateTimeFormat("fr-FR", { month: "short" }).format(bucket.date);
+            return `<text class="axis-label month-label" text-anchor="middle" x="${x(index)}" y="${height - 12}">${safeText(label)}</text>`;
           })
           .join("");
-        const points = buckets
+        const expensePoints = buckets
           .map(
             (bucket, index) =>
-              `<circle class="expense-point" data-chart-index="${index}" tabindex="0" role="button" aria-label="Voir les détails du ${safeText(new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long" }).format(bucket.date))}" cx="${x(index)}" cy="${y(bucket.expenses)}" r="4.5"><title>${safeText(formatMoney(bucket.expenses))} de dépenses — cliquer pour le détail</title></circle>`,
+              `<circle class="expense-point" aria-hidden="true" cx="${x(index)}" cy="${y(bucket.expenses)}" r="5"></circle>`,
+          )
+          .join("");
+        const incomePoints = buckets
+          .map(
+            (bucket, index) =>
+              `<circle class="income-point" aria-hidden="true" cx="${x(index)}" cy="${y(bucket.income)}" r="5"></circle>`,
           )
           .join("");
 
+        const gradientId = "chart-gradient";
         document.querySelector("#trend-chart").innerHTML =
-          `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">${grid}<path class="income-line" pathLength="1" d="${line("income")}"></path><path class="expense-line" pathLength="1" d="${line("expenses")}"></path>${points}${labels}</svg>`;
+          `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none"><defs><linearGradient id="${gradientId}-income" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1bb99b" stop-opacity=".2"></stop><stop offset="100%" stop-color="#1bb99b" stop-opacity="0"></stop></linearGradient><linearGradient id="${gradientId}-expenses" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7251ee" stop-opacity=".2"></stop><stop offset="100%" stop-color="#7251ee" stop-opacity="0"></stop></linearGradient></defs>${grid}${monthGuides}${hitAreas}<path class="chart-area income-area" fill="url(#${gradientId}-income)" d="${area("income")}"></path><path class="chart-area expense-area" fill="url(#${gradientId}-expenses)" d="${area("expenses")}"></path><path class="income-line" pathLength="1" d="${line("income")}"></path><path class="expense-line" pathLength="1" d="${line("expenses")}"></path>${incomePoints}${expensePoints}${labels}</svg><div class="chart-tooltip" id="chart-tooltip" role="tooltip" hidden></div>`;
         document.querySelector("#trend-chart").chartBuckets = buckets;
+        const monthlyAverage = buckets.reduce((sum, bucket) => sum + bucket.expenses, 0) / count;
+        document.querySelector("#daily-average").textContent = formatMoney(monthlyAverage);
+        document.querySelector("#chart-tooltip").hidden = true;
+        document.querySelector("#chart-period").textContent =
+          `Tendance mensuelle · ${new Intl.DateTimeFormat("fr-FR", { month: "short", year: "numeric" }).format(buckets[0].date)} – ${new Intl.DateTimeFormat("fr-FR", { month: "short", year: "numeric" }).format(buckets.at(-1).date)} · cliquez un mois pour le détail`;
+      }
+
+      function showChartTooltip(index, clientX, clientY) {
+        const chart = document.querySelector("#trend-chart");
+        const bucket = chart.chartBuckets?.[index];
+        const tooltip = document.querySelector("#chart-tooltip");
+        if (!bucket) return;
+        const month = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(bucket.date);
+        const countLabel = `${bucket.transactions.length} opération${bucket.transactions.length === 1 ? "" : "s"}`;
+        tooltip.innerHTML =
+          `<strong>${safeText(month)}</strong><span class="tooltip-income">Revenus <strong>${safeText(formatMoney(bucket.income))}</strong></span><span class="tooltip-expense">Dépenses <strong>${safeText(formatMoney(bucket.expenses))}</strong></span><span>${safeText(countLabel)}</span>`;
+        tooltip.hidden = false;
+        const bounds = chart.getBoundingClientRect();
+        const halfWidth = tooltip.offsetWidth / 2;
+        const xPosition = Math.max(halfWidth + 8, Math.min(bounds.width - halfWidth - 8, clientX - bounds.left));
+        const yPosition = Math.max(tooltip.offsetHeight + 8, clientY - bounds.top);
+        tooltip.style.left = `${xPosition}px`;
+        tooltip.style.top = `${yPosition}px`;
+      }
+
+      function hideChartTooltip() {
+        document.querySelector("#chart-tooltip").hidden = true;
       }
 
       function renderCategories(transactions) {
@@ -2904,7 +3347,7 @@
         }
       }
 
-      function openTransactionEditor(transaction = null) {
+      function openTransactionEditor(transaction = null, defaultType = "expense") {
         const form = document.querySelector("#transaction-form");
         form.reset();
         editingTransactionId = transaction?.id || null;
@@ -2912,10 +3355,11 @@
           transaction ? "Modifier la transaction" : "Ajouter une transaction";
         document.querySelector("#transaction-dialog-description").textContent =
           "Les changements sont enregistrés dans ce navigateur.";
-        document.querySelector("#transaction-type").value = transaction?.type || "expense";
+        const type = transaction?.type || defaultType;
+        document.querySelector("#transaction-type").value = type;
         updateTransactionCategoryOptions(
-          transaction?.type || "expense",
-          transaction?.categoryId,
+          type,
+          transaction?.categoryId || (type === "income" ? "revenus" : undefined),
         );
         document.querySelector("#transaction-label").value = transaction?.label || "";
         document.querySelector("#transaction-amount").value = transaction?.amount ?? "";
@@ -3058,14 +3502,13 @@
         const bucket = document.querySelector("#trend-chart").chartBuckets?.[index];
         if (!bucket) return;
         const date = new Intl.DateTimeFormat("fr-FR", {
-          day: "numeric",
           month: "long",
           year: "numeric",
         }).format(bucket.date);
         const net = bucket.income - bucket.expenses;
         openDetail({
-          title: `Détail du ${date}`,
-          description: "Revenus et dépenses de ce point du graphique.",
+          title: `Détail pour ${date}`,
+          description: `Revenus et dépenses de ${date}.`,
           summaryLabel: `Solde · ${formatMoney(bucket.income)} de revenus − ${formatMoney(bucket.expenses)} de dépenses`,
           total: net,
           transactions: bucket.transactions,
@@ -3198,8 +3641,9 @@
       function renderDashboard() {
         const range = getDateRange();
         const transactions = getPeriodTransactions();
+        updateSidebarSummary(transactions);
         renderSummary(transactions, range);
-        renderTrendChart(transactions, range);
+        renderTrendChart();
         renderCategories(transactions);
         renderBudgets(transactions);
         renderTransactions(transactions);
@@ -3281,6 +3725,13 @@
           dashboardData = await loadData();
           renderCategoryOptions();
           renderDashboard();
+          setupSectionNavigation();
+          document.querySelector("#quick-add-expense").addEventListener("click", () => {
+            openTransactionEditor(null, "expense");
+          });
+          document.querySelector("#quick-add-income").addEventListener("click", () => {
+            openTransactionEditor(null, "income");
+          });
           document.querySelector("#add-transaction").addEventListener("click", () => {
             openTransactionEditor();
           });
@@ -3400,6 +3851,27 @@
           document.querySelector("#detail-edit-budget").addEventListener("click", () => {
             if (detailCategoryId) openBudgetEditor(detailCategoryId);
           });
+          const trendChart = document.querySelector("#trend-chart");
+          trendChart.addEventListener("pointermove", (event) => {
+            const chartPoint = event.target.closest("[data-chart-index]");
+            if (chartPoint) {
+              showChartTooltip(Number(chartPoint.dataset.chartIndex), event.clientX, event.clientY);
+            }
+          });
+          trendChart.addEventListener("pointerleave", hideChartTooltip);
+          trendChart.addEventListener("focusin", (event) => {
+            const chartPoint = event.target.closest("[data-chart-index]");
+            if (!chartPoint) return;
+            const bounds = chartPoint.getBoundingClientRect();
+            showChartTooltip(
+              Number(chartPoint.dataset.chartIndex),
+              bounds.left + bounds.width / 2,
+              bounds.top,
+            );
+          });
+          trendChart.addEventListener("focusout", (event) => {
+            if (!trendChart.contains(event.relatedTarget)) hideChartTooltip();
+          });
           document.querySelector("#period-select").addEventListener("change", (event) => {
             selectedPeriod = event.target.value;
             showAllTransactions = false;
@@ -3451,7 +3923,7 @@
               return;
             }
             if (event.key !== "Enter" && event.key !== " ") return;
-            const interactiveChartItem = event.target.closest(".expense-point, .donut-segment");
+            const interactiveChartItem = event.target.closest(".chart-hit-area, .income-point, .expense-point, .donut-segment");
             if (interactiveChartItem) {
               event.preventDefault();
               interactiveChartItem.dispatchEvent(new MouseEvent("click", { bubbles: true }));
