@@ -34,6 +34,103 @@
         -moz-osx-font-smoothing: grayscale;
       }
 
+      [hidden] {
+        display: none !important;
+      }
+
+      .detail-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 0 21px 17px;
+      }
+
+      .detail-actions .button {
+        min-height: 35px;
+      }
+
+      .button.danger {
+        border: 1px solid #f2d3dc;
+        background: #fff4f6;
+        box-shadow: none;
+        color: #b23c5d;
+      }
+
+      .button.danger:hover {
+        background: #ffe8ee;
+      }
+
+      .editor-dialog {
+        width: min(460px, calc(100vw - 28px)) !important;
+      }
+
+      .editor-form {
+        display: grid;
+        gap: 16px;
+        padding: 20px 22px 22px;
+      }
+
+      .editor-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+      }
+
+      .editor-field {
+        display: grid;
+        min-width: 0;
+        gap: 6px;
+      }
+
+      .editor-field.full {
+        grid-column: 1 / -1;
+      }
+
+      .editor-field label {
+        color: #5b5274;
+        font-size: 9px;
+        font-weight: 700;
+      }
+
+      .editor-field input,
+      .editor-field select {
+        width: 100%;
+        min-width: 0;
+        height: 40px;
+        padding: 0 10px;
+        border: 1px solid #e8e1f1;
+        border-radius: 9px;
+        outline: none;
+        background: white;
+        color: var(--ink);
+        font-size: 10px;
+      }
+
+      .editor-field input:focus,
+      .editor-field select:focus {
+        border-color: #a895ef;
+        box-shadow: 0 0 0 3px rgb(105 81 232 / 10%);
+      }
+
+      .editor-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+        padding-top: 2px;
+      }
+
+      .editor-actions .delete-action {
+        margin-right: auto;
+      }
+
+      .editor-hint {
+        margin: -5px 0 0;
+        color: #8d85a1;
+        font-size: 9px;
+        line-height: 1.5;
+      }
+
       * {
         box-sizing: border-box;
       }
@@ -184,6 +281,22 @@
         font-size: 11px;
       }
 
+      .storage-notice {
+        margin-bottom: 14px;
+        padding: 10px 13px;
+        border: 1px solid #d5efe7;
+        border-radius: 10px;
+        background: #f0fbf7;
+        color: #157860;
+        font-size: 10px;
+      }
+
+      .storage-notice.error {
+        border-color: #f3d4dc;
+        background: #fff3f6;
+        color: #a73858;
+      }
+
       .tip-card p {
         margin: 0;
         color: var(--muted);
@@ -311,6 +424,12 @@
         align-items: flex-end;
         gap: 14px;
         margin-bottom: 23px;
+      }
+
+      .page-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
       }
 
       .eyebrow {
@@ -865,6 +984,40 @@
       .budget-list {
         display: grid;
         gap: 14px;
+      }
+
+      .budget-alerts {
+        display: grid;
+        gap: 7px;
+        margin: -4px 0 15px;
+      }
+
+      .budget-alert {
+        display: flex;
+        width: 100%;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 9px 10px;
+        border: 1px solid #f7dfb4;
+        border-radius: 10px;
+        background: #fff8eb;
+        color: #955d14;
+        font-size: 9px;
+        line-height: 1.45;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .budget-alert.over {
+        border-color: #f4cbd6;
+        background: #fff2f5;
+        color: #a53656;
+      }
+
+      .budget-alert svg {
+        width: 14px;
+        height: 14px;
+        flex: 0 0 auto;
       }
 
       .budget-item {
@@ -1998,6 +2151,28 @@
           align-items: flex-start;
         }
       }
+
+      @media (max-width: 430px) {
+        .editor-form {
+          padding: 17px;
+        }
+
+        .editor-fields {
+          gap: 10px;
+        }
+
+        .editor-actions {
+          justify-content: stretch;
+        }
+
+        .editor-actions .button {
+          flex: 1 1 auto;
+        }
+
+        .editor-actions .delete-action {
+          margin-right: 0;
+        }
+      }
     </style>
   </head>
   <body>
@@ -2080,12 +2255,20 @@
             <h1 id="page-title">Vos finances, en clair.<span class="demo-badge">Données fictives</span></h1>
             <p class="subtitle" id="period-label">Résumé de votre budget.</p>
           </div>
-          <button class="button secondary" id="export-button" type="button" title="Télécharger les transactions affichées au format CSV">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            Exporter CSV
-          </button>
+          <div class="page-actions">
+            <button class="button" id="add-transaction" type="button">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Ajouter
+            </button>
+            <button class="button secondary" id="export-button" type="button" title="Télécharger les transactions affichées au format CSV">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              Exporter CSV
+            </button>
+            <button class="button secondary" id="reset-data" type="button" hidden>Réinitialiser</button>
+          </div>
         </section>
 
+        <div class="storage-notice" id="storage-notice" role="status" hidden></div>
         <section class="kpi-grid" aria-label="Résumé financier">
           <article class="card kpi-card" role="button" tabindex="0" data-detail-type="income" aria-label="Voir le détail des revenus">
             <div class="kpi-label"><span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17 10 11l4 4 6-8m0 0h-5m5 0v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Revenus</div>
@@ -2138,6 +2321,7 @@
               <div><h2 class="card-title">Budgets par catégorie</h2><p class="card-subtitle">Dépenses par rapport aux limites prévues</p></div>
               <span class="text-button" id="budget-period">Mois des données</span>
             </div>
+            <div class="budget-alerts" id="budget-alerts" aria-live="polite"></div>
             <button class="budget-total" id="budget-total-detail" type="button" aria-label="Voir le détail de tous les budgets"><strong id="budget-spent">—</strong><span id="budget-limit">sur — prévus</span></button>
             <div class="budget-list" id="budget-list"></div>
           </article>
@@ -2178,7 +2362,83 @@
         <div class="detail-summary"><span id="detail-summary-label">Total</span><strong id="detail-summary-total"></strong></div>
         <div class="budget-detail-meter" id="detail-budget-meter" hidden><span></span></div>
         <div class="detail-list" id="detail-list"></div>
+        <div class="detail-actions" id="detail-actions" hidden>
+          <button class="button secondary" id="detail-edit-transaction" type="button">Modifier la transaction</button>
+          <button class="button danger" id="detail-delete-transaction" type="button">Supprimer</button>
+          <button class="button secondary" id="detail-edit-budget" type="button">Modifier le budget</button>
+        </div>
       </div>
+    </dialog>
+
+    <dialog class="detail-dialog editor-dialog" id="transaction-dialog" aria-labelledby="transaction-dialog-title">
+     <form class="detail-content" id="transaction-form">
+       <header class="detail-heading">
+         <div>
+           <h2 id="transaction-dialog-title">Ajouter une transaction</h2>
+           <p id="transaction-dialog-description">Les modifications seront enregistrées dans ce navigateur.</p>
+         </div>
+         <button class="detail-close" id="transaction-dialog-close" type="button" aria-label="Fermer">
+           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+         </button>
+       </header>
+       <div class="editor-form">
+         <div class="editor-fields">
+           <div class="editor-field">
+             <label for="transaction-type">Type</label>
+             <select id="transaction-type" name="type" required>
+               <option value="expense">Dépense</option>
+               <option value="income">Revenu</option>
+             </select>
+           </div>
+           <div class="editor-field">
+             <label for="transaction-category">Catégorie</label>
+             <select id="transaction-category" name="categoryId" required></select>
+           </div>
+           <div class="editor-field full">
+             <label for="transaction-label">Libellé</label>
+             <input id="transaction-label" name="label" type="text" maxlength="80" placeholder="Ex. Courses du marché" required />
+           </div>
+           <div class="editor-field">
+             <label for="transaction-amount">Montant (€)</label>
+             <input id="transaction-amount" name="amount" type="number" min="0.01" max="10000000" step="0.01" placeholder="24,50" required />
+           </div>
+           <div class="editor-field">
+             <label for="transaction-date">Date</label>
+             <input id="transaction-date" name="date" type="date" required />
+           </div>
+         </div>
+         <div class="editor-actions">
+           <button class="button danger delete-action" id="transaction-delete" type="button" hidden>Supprimer</button>
+           <button class="button secondary" id="transaction-cancel" type="button">Annuler</button>
+           <button class="button" type="submit" id="transaction-save">Enregistrer</button>
+         </div>
+       </div>
+     </form>
+    </dialog>
+
+    <dialog class="detail-dialog editor-dialog" id="budget-dialog" aria-labelledby="budget-dialog-title">
+     <form class="detail-content" id="budget-form">
+       <header class="detail-heading">
+         <div>
+           <h2 id="budget-dialog-title">Modifier le budget</h2>
+           <p id="budget-dialog-description">Définissez une nouvelle limite pour cette catégorie.</p>
+         </div>
+         <button class="detail-close" id="budget-dialog-close" type="button" aria-label="Fermer">
+           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+         </button>
+       </header>
+       <div class="editor-form">
+         <div class="editor-field">
+           <label for="budget-amount">Limite mensuelle (€)</label>
+           <input id="budget-amount" name="amount" type="number" min="0.01" max="10000000" step="0.01" required />
+         </div>
+         <p class="editor-hint" id="budget-current-spend"></p>
+         <div class="editor-actions">
+           <button class="button secondary" id="budget-cancel" type="button">Annuler</button>
+           <button class="button" type="submit">Enregistrer le budget</button>
+         </div>
+       </div>
+     </form>
     </dialog>
 
     <script src="data.js"></script>
@@ -2202,6 +2462,103 @@
       let selectedCategory = "all";
       let showAllTransactions = false;
       let visibleTransactions = [];
+      let editingTransactionId = null;
+      let detailTransactionId = null;
+      let detailCategoryId = null;
+      let hasSavedChanges = false;
+      let noticeTimer;
+
+      const STORAGE_KEY = "clair-budget-overrides-v1";
+
+      function announce(message, isError = false) {
+        const notice = document.querySelector("#storage-notice");
+        window.clearTimeout(noticeTimer);
+        notice.textContent = message;
+        notice.classList.toggle("error", isError);
+        notice.hidden = false;
+        if (!isError) {
+          noticeTimer = window.setTimeout(() => {
+            notice.hidden = true;
+          }, 4000);
+        }
+      }
+
+      function updateResetButton() {
+        document.querySelector("#reset-data").hidden = !hasSavedChanges;
+      }
+
+      function applySavedChanges(baseData) {
+        let raw;
+        try {
+          raw = localStorage.getItem(STORAGE_KEY);
+        } catch (error) {
+          announce("Le stockage local est indisponible : les modifications ne pourront pas être conservées.", true);
+          return baseData;
+        }
+
+        if (!raw) return baseData;
+        hasSavedChanges = true;
+        updateResetButton();
+
+        try {
+          const saved = JSON.parse(raw);
+          if (saved?.version !== 1 || !Array.isArray(saved.transactions) || !saved.budgets || typeof saved.budgets !== "object") {
+            throw new Error("Le format des modifications sauvegardées n’est pas reconnu.");
+          }
+          const savedData = validateData({ ...baseData, transactions: saved.transactions });
+          const categories = savedData.categories.map((category) => {
+            if (!Object.hasOwn(saved.budgets, category.id)) return category;
+            const monthlyBudget = saved.budgets[category.id];
+            if (!Number.isFinite(monthlyBudget) || monthlyBudget < 0) {
+              throw new Error(`Le budget sauvegardé pour « ${category.name} » est invalide.`);
+            }
+            return { ...category, monthlyBudget };
+          });
+          announce("Vos transactions et budgets sauvegardés ont été restaurés.");
+          return { ...savedData, categories };
+        } catch (error) {
+          console.error("Could not restore saved dashboard changes:", error);
+          announce(`Les modifications locales n’ont pas pu être restaurées : ${error.message}`, true);
+          return baseData;
+        }
+      }
+
+      function persistChanges(nextData) {
+        const budgets = Object.fromEntries(
+          nextData.categories.map((category) => [category.id, category.monthlyBudget]),
+        );
+        try {
+          localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({ version: 1, transactions: nextData.transactions, budgets }),
+          );
+          return true;
+        } catch (error) {
+          console.error("Could not save dashboard changes:", error);
+          announce("La modification n’a pas été enregistrée. Vérifiez le stockage de votre navigateur.", true);
+          return false;
+        }
+      }
+
+      function commitChanges(nextData, successMessage) {
+        if (!persistChanges(nextData)) return false;
+        dashboardData = nextData;
+        hasSavedChanges = true;
+        updateResetButton();
+        renderDashboard();
+        announce(successMessage);
+        return true;
+      }
+
+      function createTransactionId() {
+        let id;
+        do {
+          id = window.crypto?.randomUUID
+            ? window.crypto.randomUUID()
+            : `transaction-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+        } while (dashboardData.transactions.some((transaction) => transaction.id === id));
+        return id;
+      }
 
       const formatMoney = (value) =>
         new Intl.NumberFormat("fr-FR", {
@@ -2226,6 +2583,12 @@
 
       function parseDate(date) {
         return new Date(`${date}T12:00:00`);
+      }
+
+      function isValidDateString(value) {
+        if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+        const date = new Date(`${value}T00:00:00.000Z`);
+        return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
       }
 
       function getDateRange() {
@@ -2422,6 +2785,12 @@
 
       function openDetail({ title, description, summaryLabel, total, transactions, budget }) {
         const dialog = document.querySelector("#detail-dialog");
+        const actions = document.querySelector("#detail-actions");
+        actions.hidden = true;
+        dialog.dataset.transactionId = "";
+        dialog.dataset.categoryId = "";
+        detailTransactionId = null;
+        detailCategoryId = null;
         document.querySelector("#detail-title").textContent = title;
         document.querySelector("#detail-description").textContent = description;
         document.querySelector("#detail-summary-label").textContent = summaryLabel;
@@ -2466,6 +2835,12 @@
           total: transaction.amount,
           transactions: [transaction],
         });
+        detailTransactionId = transaction.id;
+        const actions = document.querySelector("#detail-actions");
+        actions.hidden = false;
+        document.querySelector("#detail-edit-transaction").hidden = false;
+        document.querySelector("#detail-delete-transaction").hidden = false;
+        document.querySelector("#detail-edit-budget").hidden = true;
       }
 
       function openCategoryDetail(categoryId) {
@@ -2483,6 +2858,12 @@
           transactions,
           budget: budget ? { ratio: total / budget } : null,
         });
+        if (budget) {
+          detailCategoryId = categoryId;
+          document.querySelector("#detail-dialog").dataset.categoryId = categoryId;
+          document.querySelector("#detail-actions").hidden = false;
+          document.querySelector("#detail-edit-budget").hidden = false;
+        }
       }
 
       function openBudgetDetail(categoryId) {
@@ -2504,6 +2885,109 @@
           transactions,
           budget: { ratio },
         });
+        detailCategoryId = categoryId;
+        document.querySelector("#detail-dialog").dataset.categoryId = categoryId;
+        document.querySelector("#detail-actions").hidden = false;
+        document.querySelector("#detail-edit-budget").hidden = false;
+      }
+
+      function updateTransactionCategoryOptions(type, selectedId) {
+        const categorySelect = document.querySelector("#transaction-category");
+        const categories = dashboardData.categories.filter((category) =>
+          type === "income" ? category.id === "revenus" : category.id !== "revenus",
+        );
+        categorySelect.innerHTML = categories
+          .map((category) => `<option value="${safeText(category.id)}">${safeText(category.name)}</option>`)
+          .join("");
+        if (selectedId && categories.some((category) => category.id === selectedId)) {
+          categorySelect.value = selectedId;
+        }
+      }
+
+      function openTransactionEditor(transaction = null) {
+        const form = document.querySelector("#transaction-form");
+        form.reset();
+        editingTransactionId = transaction?.id || null;
+        document.querySelector("#transaction-dialog-title").textContent =
+          transaction ? "Modifier la transaction" : "Ajouter une transaction";
+        document.querySelector("#transaction-dialog-description").textContent =
+          "Les changements sont enregistrés dans ce navigateur.";
+        document.querySelector("#transaction-type").value = transaction?.type || "expense";
+        updateTransactionCategoryOptions(
+          transaction?.type || "expense",
+          transaction?.categoryId,
+        );
+        document.querySelector("#transaction-label").value = transaction?.label || "";
+        document.querySelector("#transaction-amount").value = transaction?.amount ?? "";
+        document.querySelector("#transaction-date").value = transaction?.date || dashboardData.period.end;
+        document.querySelector("#transaction-delete").hidden = !transaction;
+        document.querySelector("#transaction-save").textContent = transaction ? "Enregistrer" : "Ajouter";
+        if (document.querySelector("#detail-dialog").open) {
+          document.querySelector("#detail-dialog").close();
+        }
+        document.querySelector("#transaction-dialog").showModal();
+      }
+
+      function openBudgetEditor(categoryId) {
+        const category = dashboardData.categories.find((item) => item.id === categoryId);
+        if (!category || category.id === "revenus") return;
+        const spent = getPeriodTransactions()
+          .filter((transaction) => transaction.categoryId === categoryId && transaction.type === "expense")
+          .reduce((sum, transaction) => sum + transaction.amount, 0);
+        const dialog = document.querySelector("#budget-dialog");
+        dialog.dataset.categoryId = categoryId;
+        document.querySelector("#budget-dialog-title").textContent = `Budget ${category.name}`;
+        document.querySelector("#budget-dialog-description").textContent =
+          `Définissez la limite mensuelle de la catégorie ${category.name}.`;
+        document.querySelector("#budget-amount").value = category.monthlyBudget;
+        document.querySelector("#budget-current-spend").textContent =
+          `${formatMoney(spent)} dépensés sur la période affichée (${getDateRange().label}).`;
+        if (document.querySelector("#detail-dialog").open) {
+          document.querySelector("#detail-dialog").close();
+        }
+        dialog.showModal();
+      }
+
+      function deleteTransaction(transactionId) {
+        const transaction = dashboardData.transactions.find((item) => item.id === transactionId);
+        if (!transaction) return false;
+        if (!window.confirm(`Supprimer la transaction « ${transaction.label} » ?`)) return false;
+        const nextData = {
+          ...dashboardData,
+          transactions: dashboardData.transactions.filter((item) => item.id !== transactionId),
+        };
+        if (!commitChanges(nextData, "Transaction supprimée et modifications sauvegardées.")) return false;
+        if (document.querySelector("#detail-dialog").open) {
+          document.querySelector("#detail-dialog").close();
+        }
+        if (document.querySelector("#transaction-dialog").open) {
+          document.querySelector("#transaction-dialog").close();
+        }
+        return true;
+      }
+
+      function resetSavedChanges() {
+        if (!hasSavedChanges) return;
+        if (!window.confirm("Réinitialiser les transactions et budgets enregistrés et revenir aux données fictives d’origine ?")) return;
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+        } catch (error) {
+          console.error("Could not reset saved dashboard changes:", error);
+          announce("Impossible de supprimer les modifications locales. Vérifiez le stockage de votre navigateur.", true);
+          return;
+        }
+        hasSavedChanges = false;
+        updateResetButton();
+        loadData()
+          .then((data) => {
+            dashboardData = data;
+            renderDashboard();
+            announce("Les données fictives d’origine ont été restaurées.");
+          })
+          .catch((error) => {
+            console.error("Could not reload demo dashboard data:", error);
+            announce(`Impossible de restaurer les données fictives : ${error.message}`, true);
+          });
       }
 
       function openMetricDetail(type) {
@@ -2628,6 +3112,23 @@
         document.querySelector("#budget-spent").textContent = formatMoney(totalSpent);
         document.querySelector("#budget-limit").textContent = `sur ${formatMoney(totalBudget)} prévus`;
         const modifiers = ["", "orange", "blue", "purple", "red"];
+        const alerts = expenseCategories
+          .map((category) => ({
+            category,
+            spent: spent.get(category.id) || 0,
+            ratio: category.monthlyBudget ? (spent.get(category.id) || 0) / category.monthlyBudget : 0,
+          }))
+          .filter(({ ratio }) => ratio >= 0.8)
+          .sort((a, b) => b.ratio - a.ratio);
+        document.querySelector("#budget-alerts").innerHTML = alerts
+          .map(({ category, spent: amount, ratio }) => {
+            const over = ratio > 1;
+            const message = over
+              ? `Budget ${category.name} dépassé de ${formatMoney(amount - category.monthlyBudget)}.`
+              : `${category.name} : ${Math.round(ratio * 100)} % du budget utilisé, ${formatMoney(category.monthlyBudget - amount)} restants.`;
+            return `<button class="budget-alert ${over ? "over" : ""}" type="button" data-category-id="${safeText(category.id)}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 8v4m0 4h.01M10.3 3.8 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3l-7.5-13.2a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>${safeText(message)}</span></button>`;
+          })
+          .join("");
         document.querySelector("#budget-list").innerHTML = expenseCategories.length
           ? expenseCategories
               .map((category, index) => {
@@ -2635,8 +3136,11 @@
                 const ratio = category.monthlyBudget > 0 ? amount / category.monthlyBudget : 0;
                 const width = Math.min(100, ratio * 100);
                 const over = ratio > 1;
-                const modifier = over ? "red" : modifiers[index % modifiers.length];
-                return `<button class="budget-item" type="button" data-category-id="${safeText(category.id)}" aria-label="Voir le détail du budget ${safeText(category.name)}"><span class="budget-meta"><span>${safeText(category.name)}</span><strong class="${over ? "over" : ""}">${safeText(formatMoney(amount))} <span style="color:#a0aaa4;font-weight:450">/ ${safeText(formatMoney(category.monthlyBudget))}</span></strong></span><span class="progress-track" role="progressbar" aria-label="Budget ${safeText(category.name)}" aria-valuenow="${Math.round(Math.min(100, ratio * 100))}" aria-valuemin="0" aria-valuemax="100"><span class="progress-fill ${modifier}" style="display:block;width:${width}%"></span></span></button>`;
+                const modifier = over ? "red" : ratio >= 0.8 ? "orange" : modifiers[index % modifiers.length];
+                const remainingLabel = over
+                  ? `Dépassé de ${formatMoney(amount - category.monthlyBudget)}`
+                  : `${formatMoney(category.monthlyBudget - amount)} restants`;
+                return `<button class="budget-item" type="button" data-category-id="${safeText(category.id)}" aria-label="Voir le détail du budget ${safeText(category.name)} : ${safeText(remainingLabel)}"><span class="budget-meta"><span>${safeText(category.name)}</span><strong class="${over ? "over" : ""}">${safeText(formatMoney(amount))} <span style="color:#a0aaa4;font-weight:450">/ ${safeText(formatMoney(category.monthlyBudget))}</span></strong></span><span class="progress-track" role="progressbar" aria-label="Budget ${safeText(category.name)}" aria-valuenow="${Math.round(Math.min(100, ratio * 100))}" aria-valuemin="0" aria-valuemax="100"><span class="progress-fill ${modifier}" style="display:block;width:${width}%"></span></span></button>`;
               })
               .join("")
           : '<div class="empty-state">Aucun budget défini dans les données.</div>';
@@ -2726,36 +3230,50 @@
           throw new Error("Le format de data.json ne contient pas les catégories, transactions et dates attendues.");
         }
         const categoryIds = new Set(data.categories.map((category) => category.id));
-        const invalidTransaction = data.transactions.find(
-          (transaction) =>
-            !categoryIds.has(transaction.categoryId) ||
+        const transactionIds = new Set();
+        const invalidTransaction = data.transactions.find((transaction) => {
+          const duplicateId = transactionIds.has(transaction.id);
+          transactionIds.add(transaction.id);
+          return (
+            !transaction.id ||
+            duplicateId ||
+            typeof transaction.label !== "string" ||
+            !transaction.label.trim() ||
             !Number.isFinite(transaction.amount) ||
-            !["income", "expense"].includes(transaction.type),
-        );
+            transaction.amount <= 0 ||
+            !isValidDateString(transaction.date) ||
+            !categoryIds.has(transaction.categoryId) ||
+            !["income", "expense"].includes(transaction.type) ||
+            (transaction.type === "income") !== (transaction.categoryId === "revenus")
+          );
+        });
         if (invalidTransaction) {
           throw new Error(`Transaction invalide dans data.json : ${invalidTransaction.id || invalidTransaction.label}.`);
+        }
+        if (data.categories.some((category) => !Number.isFinite(category.monthlyBudget) || category.monthlyBudget < 0)) {
+          throw new Error("Un budget de catégorie contient un montant invalide.");
         }
         return data;
       }
 
       async function loadData() {
         const fallback = window.DASHBOARD_DATA;
+        let baseData;
         if (location.protocol === "file:") {
           if (!fallback) throw new Error("Le fichier data.js contenant les données de démonstration est introuvable.");
-          return validateData(fallback);
-        }
-
-        try {
-          const response = await fetch("./data.json", { cache: "no-store" });
-          if (!response.ok) throw new Error(`Impossible de charger data.json (HTTP ${response.status}).`);
-          return validateData(await response.json());
-        } catch (error) {
-          if (fallback) {
+          baseData = validateData(fallback);
+        } else {
+          try {
+            const response = await fetch("./data.json", { cache: "no-store" });
+            if (!response.ok) throw new Error(`Impossible de charger data.json (HTTP ${response.status}).`);
+            baseData = validateData(await response.json());
+          } catch (error) {
+            if (!fallback) throw error;
             console.warn("Chargement de data.json impossible, utilisation des données de secours intégrées à data.js.", error);
-            return validateData(fallback);
+            baseData = validateData(fallback);
           }
-          throw error;
         }
+        return applySavedChanges(baseData);
       }
 
       async function startDashboard() {
@@ -2763,6 +3281,125 @@
           dashboardData = await loadData();
           renderCategoryOptions();
           renderDashboard();
+          document.querySelector("#add-transaction").addEventListener("click", () => {
+            openTransactionEditor();
+          });
+          document.querySelector("#reset-data").addEventListener("click", resetSavedChanges);
+          document.querySelector("#transaction-type").addEventListener("change", (event) => {
+            updateTransactionCategoryOptions(
+              event.target.value,
+              document.querySelector("#transaction-category").value,
+            );
+          });
+          document.querySelector("#transaction-label").addEventListener("input", (event) => {
+            event.target.setCustomValidity("");
+          });
+          document.querySelector("#transaction-form").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const labelField = document.querySelector("#transaction-label");
+            const label = labelField.value.trim();
+            if (!label) {
+              labelField.setCustomValidity("Saisissez un libellé de transaction.");
+              labelField.reportValidity();
+              return;
+            }
+            const type = document.querySelector("#transaction-type").value;
+            const categoryId = document.querySelector("#transaction-category").value;
+            const amount = Number(document.querySelector("#transaction-amount").value);
+            const date = document.querySelector("#transaction-date").value;
+            const existing = dashboardData.transactions.find(
+              (transaction) => transaction.id === editingTransactionId,
+            );
+            if (editingTransactionId && !existing) {
+              announce("Cette transaction n’existe plus. Fermez puis rouvrez le formulaire.", true);
+              return;
+            }
+            if (!Number.isFinite(amount) || amount <= 0 || !date || !categoryId) {
+              announce("Vérifiez le montant, la date et la catégorie de la transaction.", true);
+              return;
+            }
+            const category = dashboardData.categories.find((item) => item.id === categoryId);
+            if (!category || (type === "income") !== (categoryId === "revenus")) {
+              announce("La catégorie sélectionnée ne correspond pas au type de transaction.", true);
+              return;
+            }
+
+            const transaction = {
+              ...existing,
+              id: existing?.id || createTransactionId(),
+              date,
+              label,
+              categoryId,
+              type,
+              amount,
+            };
+            const nextData = {
+              ...dashboardData,
+              transactions: existing
+                ? dashboardData.transactions.map((item) => item.id === existing.id ? transaction : item)
+                : [...dashboardData.transactions, transaction],
+            };
+            const message = existing
+              ? "Transaction modifiée et modifications sauvegardées."
+              : "Transaction ajoutée et modifications sauvegardées.";
+            if (commitChanges(nextData, message)) {
+              editingTransactionId = null;
+              document.querySelector("#transaction-dialog").close();
+            }
+          });
+          document.querySelector("#transaction-delete").addEventListener("click", () => {
+            if (editingTransactionId) deleteTransaction(editingTransactionId);
+          });
+          document.querySelector("#transaction-dialog-close").addEventListener("click", () => {
+            document.querySelector("#transaction-dialog").close();
+          });
+          document.querySelector("#transaction-cancel").addEventListener("click", () => {
+            document.querySelector("#transaction-dialog").close();
+          });
+          document.querySelector("#transaction-dialog").addEventListener("click", (event) => {
+            if (event.target === event.currentTarget) event.currentTarget.close();
+          });
+          document.querySelector("#budget-form").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const dialog = document.querySelector("#budget-dialog");
+            const categoryId = dialog.dataset.categoryId;
+            const category = dashboardData.categories.find((item) => item.id === categoryId);
+            const amount = Number(document.querySelector("#budget-amount").value);
+            if (!category || !Number.isFinite(amount) || amount <= 0) {
+              announce("Saisissez un budget valide supérieur à zéro.", true);
+              return;
+            }
+            const nextData = {
+              ...dashboardData,
+              categories: dashboardData.categories.map((item) =>
+                item.id === categoryId ? { ...item, monthlyBudget: amount } : item,
+              ),
+            };
+            if (commitChanges(nextData, `Budget ${category.name} mis à jour et sauvegardé.`)) {
+              dialog.close();
+            }
+          });
+          document.querySelector("#budget-dialog-close").addEventListener("click", () => {
+            document.querySelector("#budget-dialog").close();
+          });
+          document.querySelector("#budget-cancel").addEventListener("click", () => {
+            document.querySelector("#budget-dialog").close();
+          });
+          document.querySelector("#budget-dialog").addEventListener("click", (event) => {
+            if (event.target === event.currentTarget) event.currentTarget.close();
+          });
+          document.querySelector("#detail-edit-transaction").addEventListener("click", () => {
+            const transaction = dashboardData.transactions.find(
+              (item) => item.id === detailTransactionId,
+            );
+            if (transaction) openTransactionEditor(transaction);
+          });
+          document.querySelector("#detail-delete-transaction").addEventListener("click", () => {
+            if (detailTransactionId) deleteTransaction(detailTransactionId);
+          });
+          document.querySelector("#detail-edit-budget").addEventListener("click", () => {
+            if (detailCategoryId) openBudgetEditor(detailCategoryId);
+          });
           document.querySelector("#period-select").addEventListener("change", (event) => {
             selectedPeriod = event.target.value;
             showAllTransactions = false;
